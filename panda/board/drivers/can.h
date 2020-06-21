@@ -154,7 +154,6 @@ void can_init_all(void) {
   for (uint8_t i=0U; i < CAN_MAX; i++) {
     can_init(i);
   }
-  current_board->enable_can_transcievers(true);
 }
 
 void can_flip_buses(uint8_t bus1, uint8_t bus2){
@@ -466,3 +465,4 @@ void can_init(uint8_t can_number) {
     process_can(can_number);
   }
 }
+
