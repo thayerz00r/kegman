@@ -62,18 +62,18 @@ class PathPlanner():
     self.sR_delay_counter = 0
     self.steerRatio_new = 0.0
     self.sR_time = 1
-    
+
     kegman = kegman_conf(CP)
     if kegman.conf['steerRatio'] == "-1":
       self.steerRatio = CP.steerRatio
     else:
       self.steerRatio = float(kegman.conf['steerRatio'])
-      
+
     if kegman.conf['steerRateCost'] == "-1":
       self.steerRateCost = CP.steerRateCost
     else:
       self.steerRateCost = float(kegman.conf['steerRateCost'])
-      
+
     self.sR = [float(kegman.conf['steerRatio']), (float(kegman.conf['steerRatio']) + float(kegman.conf['sR_boost']))]
     self.sRBP = [float(kegman.conf['sR_BP0']), float(kegman.conf['sR_BP1'])]
 
@@ -90,7 +90,7 @@ class PathPlanner():
     self.prev_one_blinker = False
 
 
-      
+
   def setup_mpc(self):
     self.libmpc = libmpc_py.libmpc
     self.libmpc.init(MPC_COST_LAT.PATH, MPC_COST_LAT.LANE, MPC_COST_LAT.HEADING, self.steer_rate_cost)
@@ -106,10 +106,10 @@ class PathPlanner():
     self.angle_steers_des_mpc = 0.0
     self.angle_steers_des_prev = 0.0
     self.angle_steers_des_time = 0.0
-    
+
 
   def update(self, sm, pm, CP, VM):
-    
+
     v_ego = sm['carState'].vEgo
     angle_steers = sm['carState'].steeringAngle
     active = sm['controlsState'].active
@@ -125,7 +125,7 @@ class PathPlanner():
     VM.update_params(x, sr)
 
     curvature_factor = VM.curvature_factor(v_ego)
-    
+
     # Get steerRatio and steerRateCost from kegman.json every x seconds
     self.mpc_frame += 1
     if self.mpc_frame % 500 == 0:
@@ -136,17 +136,17 @@ class PathPlanner():
         if self.steerRateCost != self.steerRateCost_prev:
           self.setup_mpc()
           self.steerRateCost_prev = self.steerRateCost
-          
+
         self.sR = [float(kegman.conf['steerRatio']), (float(kegman.conf['steerRatio']) + float(kegman.conf['sR_boost']))]
         self.sRBP = [float(kegman.conf['sR_BP0']), float(kegman.conf['sR_BP1'])]
         self.sR_time = int(float(kegman.conf['sR_time'])) * 100
-         
+
       self.mpc_frame = 0
-    
-    if v_ego > 11.111:
+
+    if v_ego > 5.0:
       # boost steerRatio by boost amount if desired steer angle is high
       self.steerRatio_new = interp(abs(angle_steers), self.sRBP, self.sR)
-      
+
       self.sR_delay_counter += 1
       if self.sR_delay_counter % self.sR_time != 0:
         if self.steerRatio_new > self.steerRatio:
@@ -156,7 +156,7 @@ class PathPlanner():
         self.sR_delay_counter = 0
     else:
       self.steerRatio = self.sR[0]
-      
+
     print("steerRatio = ", self.steerRatio)
 
     self.LP.parse_model(sm['model'])
@@ -185,7 +185,7 @@ class PathPlanner():
           torque_applied = sm['carState'].steeringTorque > 0 and sm['carState'].steeringPressed
         else:
           torque_applied = sm['carState'].steeringTorque < 0 and sm['carState'].steeringPressed
-        
+
 
       blindspot_detected = ((sm['carState'].leftBlindspot and self.lane_change_direction == LaneChangeDirection.left) or
                             (sm['carState'].rightBlindspot and self.lane_change_direction == LaneChangeDirection.right))
