@@ -17,27 +17,27 @@ class LatControlPID():
 
   def reset(self):
     self.pid.reset()
-    
+
   def live_tune(self, CP):
     self.mpc_frame += 1
     if self.mpc_frame % 300 == 0:
       # live tuning through /data/openpilot/tune.py overrides interface.py settings
       self.kegman = kegman_conf()
       if self.kegman.conf['tuneGernby'] == "1":
-        self.steerKpV = [float(self.kegman.conf['Kp'])]
-        self.steerKiV = [float(self.kegman.conf['Ki'])]
-        self.steerKf = float(self.kegman.conf['Kf'])
-        self.pid = PIController((CP.lateralTuning.pid.kpBP, self.steerKpV),
-                            (CP.lateralTuning.pid.kiBP, self.steerKiV),
-                            k_f=self.steerKf, pos_limit=1.0)
+        #self.steerKpV = [float(self.kegman.conf['Kp'])]
+        #self.steerKiV = [float(self.kegman.conf['Ki'])]
+        #self.steerKf = float(self.kegman.conf['Kf'])
+        #self.pid = PIController((CP.lateralTuning.pid.kpBP, self.steerKpV),
+        #                    (CP.lateralTuning.pid.kiBP, self.steerKiV),
+        #                    k_f=self.steerKf, pos_limit=1.0)
         self.deadzone = float(self.kegman.conf['deadzone'])
-        
-      self.mpc_frame = 0    
+
+      self.mpc_frame = 0
 
 
   def update(self, active, CS, CP, path_plan):
-    self.live_tune(CP)
- 
+    #self.live_tune(CP)
+
     pid_log = log.ControlsState.LateralPIDState.new_message()
     pid_log.steerAngle = float(CS.steeringAngle)
     pid_log.steerRate = float(CS.steeringRate)
@@ -57,9 +57,9 @@ class LatControlPID():
         # TODO: feedforward something based on path_plan.rateSteers
         steer_feedforward -= path_plan.angleOffset   # subtract the offset, since it does not contribute to resistive torque
         steer_feedforward *= CS.vEgo**2  # proportional to realigning tire momentum (~ lateral accel)
-      
-      deadzone = self.deadzone    
-        
+
+      deadzone = self.deadzone
+
       check_saturation = (CS.vEgo > 10) and not CS.steeringRateLimited and not CS.steeringPressed
       output_steer = self.pid.update(self.angle_steers_des, CS.steeringAngle, check_saturation=check_saturation, override=CS.steeringPressed,
                                      feedforward=steer_feedforward, speed=CS.vEgo, deadzone=deadzone)
