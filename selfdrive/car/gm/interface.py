@@ -81,7 +81,7 @@ class CarInterface(CarInterfaceBase):
     ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
     ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.2], [0.00]]
     ret.lateralTuning.pid.kf = 0.00004   # full torque for 20 deg at 80mph means 0.00007818594
-    ret.steerRateCost = 0.5
+    ret.steerRateCost = 1.0
     ret.steerActuatorDelay = 0.3  # Default delay, not measured yet
 
     if candidate == CAR.VOLT:
@@ -102,10 +102,16 @@ class CarInterface(CarInterfaceBase):
       ret.steerRatio = 12.0
       ret.steerRatioRear = 0.
       ret.centerToFront = ret.wheelbase * 0.4 # wild guess
-      #PID tunning not to prevent oversteer
-      ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[10., 41.0], [10., 41.0]]
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.1, 0.24], [0.01, 0.019]]
-      ret.lateralTuning.pid.kf = 0.000038
+      #Rav4 from Arnepilot
+      ret.lateralTuning.init('lqr')
+      ret.lateralTuning.lqr.scale = 1500.0
+      ret.lateralTuning.lqr.ki = 0.05
+      ret.lateralTuning.lqr.a = [0., 1., -0.22619643, 1.21822268]
+      ret.lateralTuning.lqr.b = [-1.92006585e-04, 3.95603032e-05]
+      ret.lateralTuning.lqr.c = [1., 0.]
+      ret.lateralTuning.lqr.k = [-110.73572306, 451.22718255]
+      ret.lateralTuning.lqr.l = [0.3233671, 0.3185757]
+      ret.lateralTuning.lqr.dcGain = 0.002237852961363602
       tire_stiffness_factor = 0.5
 
     elif candidate == CAR.MALIBU:
