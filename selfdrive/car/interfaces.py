@@ -53,8 +53,8 @@ class CarInterfaceBase():
 
     # standard ALC params
     ret.steerControlType = car.CarParams.SteerControlType.torque
-    ret.steerMaxBP = [5., 10., 35.]
-    ret.steerMaxV = [0.5, 0.65, 1.]
+    ret.steerMaxBP = [5., 25.]
+    ret.steerMaxV = [0.6, 1.]
     ret.minSteerSpeed = 0.
 
     # stock ACC by default

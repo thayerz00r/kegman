@@ -145,7 +145,7 @@ class PathPlanner():
 
     if v_ego > 5.0:
       # boost steerRatio by boost amount if desired steer angle is high
-      self.steerRatio_new = interp(abs(angle_steers), self.sRBP, self.sR)
+      self.steerRatio_new = interp(abs(self.angle_steers_des_prev), self.sRBP, self.sR)
 
       self.sR_delay_counter += 1
       if self.sR_delay_counter % self.sR_time != 0:
