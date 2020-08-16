@@ -1,5 +1,5 @@
 Bolt EV setting value
-- sR_BP0": "3", "sR_BP1": "10", "sR_boost": "5.0", "sR_time": "2", "steerRateCost": "1.0",
+- sR_BP0": "3", "sR_BP1": "10", "sR_boost": "3.0", "sR_time": "2", "steerRateCost": "1.0",
 
 ** Note that Honda stock AEB is disabled in 0.7.5 because of occassional issues on double lane curved highways where stock AEB activates when oncoming car detected - in 0.7.4 Honda stock AEB is enabled because unsafe mode in panda was not available yet in devel**
 
@@ -12,13 +12,13 @@ If you wish you can buy me a beer or 3:  https://www.patreon.com/kegman
 
 ** <b>0.7.3 and below only:</b> If you get a red screen with "Communications Mismatch" please manually reflash panda.  Instructions are here:  https://community.comma.ai/wiki/index.php/Panda_Flashing - If you are using a GM model like the Volt and you get the communications mismatch, please try the -gm branch **
 
-  
+
 <b>WARNING:</b>  Do NOT depend on OP to stop the car in time if you are approaching an object which is not in motion in the same direction as your car.  The radar will NOT detect the stationary object in time to slow your car enough to stop.  If you are approaching a stopped vehicle you must disengage and brake as radars ignore objects that are not in motion.
 
 <b>NOTICE:</b>  Due to feedback I have turned on OTA updates.  You will receive updates automatically (after rebooting 2X) on your Eon so you don't have to reclone or git pull any longer to receive new features *MADE BETWEEN COMMA RELEASES*.  The reason why I separate the branches by release is because some releases can sometimes cause issues.  Features that I or others add, will continue to be updated when you are on the most current release.  If you DO NOT want OTA updates then create a file called "/data/no_ota_updates" and it will not perform OTA updates as long as that file exists.  
 
 
-I will attempt to detail the changes in each of the branches here: 
+I will attempt to detail the changes in each of the branches here:
 
 
 
@@ -57,9 +57,9 @@ List of changes and tweaks (latest changes at the top):
 - <b> New! EPS modified config</b>: Add epsModded value in kegman.json to change the flag for having a modded EPS.
 
 - <b> New! Timer for Nudgeless Auto Lane Change (default 2 seconds before lane change is made) </b>.  Thanks to @pjlao307 for getting this to work.  I have made the delay configurable in kegman.json
-  
+
 - <b> New! Nudgeless Auto Lane Change with configurable toggles in kegman.json. </b>  By default the behavior is like comma stock - i.e. signal above 45 mph, then nudge the steering wheel in the direction of the blinkers.  If you don't want to nudge the wheel or want ALC enabled at slower speeds, go into kegman.json and change ALCnudgeLess to "1" and ALCminSpeed to [some value] in m/s units.
-  
+
 - <b> Disabled Honda stock FCW, stock AEB because they are too sensitive on some cars. </b>
 
 - <b> New! Dynamic Steer Ratio: </b>Some Hondas and other makes / models have been suffering from excessive ping-ponging on straights since 0.6.x.  The fix was to lower steerRatio.  However lowering steerRatio makes the car turn less aggressively on curves so you lose "turnability".  Raising the steerRatio makes you take turns with maximum force, but then you have ping ponging on straights.  Dynamic steer ratio adjusts based on the steering wheel angle to give you a low steerRatio on straights and a high steerRatio on turns.  This gives the best of both worlds.  Dynamic Steer Ratio is inactive by default, to activate, please adjust the following values using the Live Tuner or edit the kegman.json file:
@@ -88,13 +88,13 @@ Add this line to adjust one bar distance following distance in seconds:
 - <b> New! Toyota support</b>:  Thanks to @j4z for adding distance interval support with his Arduino solution and also helping to debug the kegman.json issues to make Kegman fork work with Toyotas!
 
 - <b> New! Added highway speed braking profile tweaks</b>.  Note that 1barHwy, 2barHwy and 3barHwy are DELTAS.  For example if One bar distance is 0.9 seconds, 1barHwy of 0.3 will add 3 seconds to the distance during braking making you brake harder.
-  
+
 - <b> New! Added kF feedforward param to live tuner.</b>
 
 - <b> New! Enable / Disable Model based Slowdowns on turns: </b>  On tight turns, the model will slow down the car so that you can make the turn.  Some like this, some people don't.  Set slowOnCurve = "1" to enable slowdowns on curves, or "0" (default) to disable.
 
 - <b> New! Live long tuning for city speeds < 19.44 m/s (43.5 mph, 70 km/h): </b> Execute cd /data/openpilot && ./tune.sh to access live tuner on your mobile device while driving.
-  
+
 <b>Instructions for tuning steering with live tuner:</b>
 - Kp too high = the car overshoots and undershoots center
 - Kp too low = the car doesn't turn enough
@@ -103,9 +103,9 @@ Add this line to adjust one bar distance following distance in seconds:
 - SteerRatio - too high, and the car ping pongs on straights and turns, too low, and the car doesn't turn enough on curves.  If you're on a turn and the wheel is oversteering and then correcting, steerRatio is too high, and it's fighting with Kp and Ki (which you don't want) - although in the past I've been able to have an oscillating oversteering tune which could do tighter turns, but the turns werent pleasant.
 - Kf - lower this if your car oscillates and you've done everything else.  It can be lowered to 0
 - All of these parameters interact with each other so finding the balance is a bit experimental  
-  
+
 <b>Be careful and ready to take over at any time when doing this!!!</b>  The "distance" in s is the target distance the car will try to maintain.  The default distancces are 0.9s, 1.3s, 1.8s for 1,2 and 3 bar intervals.  I manipulate this value to pass to the MPC to scale the behavior which leads to harder braking or sooner braking or softer braking.  Essentially when you are approaching a car, the distance changes depending on your approach speed.  When the lead car pulls away, the distance returns to whatever your bar setting is
-  
+
 There are 3 parameters for one two and three bar distance intervals:
 xbarBP0 - is how soon it should start braking - a smaller (or negative) value means your car will brake sooner when the lead car slows, a larger value means your car will start braking later
 
@@ -124,8 +124,8 @@ Example:
 
 Everything inbetween -0.25 m/s and 3 m/s is interpolated, which adjusts the distance smoothly as you slow down depending on the lead car approach relative speed.  
 
-- <b>Highway speed braking profiles</b>:  Added highway braking profiles so that you won't follow so closely at speeds > 70 kph. 
-  
+- <b>Highway speed braking profiles</b>:  Added highway braking profiles so that you won't follow so closely at speeds > 70 kph.
+
 - <b>Live tuner for Kp and Ki</b>:  Tune your Kp and Ki values live using your cell phone by SSHing into the Eon and executing cd /data/openpilot && ./tune.sh
 
 - <b>Add @pjlao307's Dashcam Recording</b>:  Sometimes you just want to record a wicked OP run on a twisty highway to show your friends.  Sometimes you want to record a big flashing red error and complain about it and show your friends.  This does a screen video capture of the Eon screen and stores the files in /sdcard/videos on your Eon when the REC button is pressed.  Thanks to @pjlao307 and @theantihero for submitting the PR.
@@ -167,7 +167,7 @@ Everything inbetween -0.25 m/s and 3 m/s is interpolated, which adjusts the dist
 
 - <b>OTA Updates turned on</b>:  Previously I had turned off OTA updates for safety reasons - I didn't want anyone to get an unexpected result when I made changes.  It appears that many more users want OTA updates for convenience so I have turned this feature back on.  IMPORTANT: If you DO NOT want OTA updates then create a file called "/data/no_ota_updates" and it will not perform OTA updates as long as that file exists.
 
-- <b>Increase acceleration profile when lead car pulls away too quickly or no lead car</b>:  OP has two acceleration profiles, one occurs when following a lead car, and one without a lead car.  Oddly the acceleration profile when following is greater than when not following.  So sometimes a lead car will pull away so quickly, that the car goes from following to not following mode and the acceleration profile actually drops.  I've made the acceleration profiles the same so that the the car doesn't stop accelerating at the same rate when the lead car rips away quickly from a stop. 
+- <b>Increase acceleration profile when lead car pulls away too quickly or no lead car</b>:  OP has two acceleration profiles, one occurs when following a lead car, and one without a lead car.  Oddly the acceleration profile when following is greater than when not following.  So sometimes a lead car will pull away so quickly, that the car goes from following to not following mode and the acceleration profile actually drops.  I've made the acceleration profiles the same so that the the car doesn't stop accelerating at the same rate when the lead car rips away quickly from a stop.
 
 - <b>FOUR (new) Step adjustable follow distance</b>:  The default behaviour for following distance is 1.8s of following distance.  It is not adjustable.  This typically causes, in some traffic conditions, the user to be constantly cut off by other drivers, and 1.8s of follow distance instantly becomes much shorter (like 0.2-0.5s).  I wanted to reintroduce honda 'stock-like' ACC behaviour back into the mix to prevent people from getting cutoff so often.  Here is a summary of follow distance in seconds:  <b>1 bar = 0.9s, 2 bars = 1.3s, 3 bars = 1.8, 4 bars = 2.5s of follow distance</b>. Thanks to @arne182, whose code I built upon.
 
@@ -216,6 +216,6 @@ Enjoy everyone.
 - reboot
 - enjoy
 
-<b>NOTE:</b> If you have upgraded at any time to v0.5.10, v0.6.x and you want to go back to a branch with v0.5.9 or v0.5.8, then you have to SSH into the Eon and edit the file /data/params/d/ControlsParams and rename "angle_model_bias" to "angle_offset" or your car will have Dash Errors and you'll be scratching your head for hours! 
+<b>NOTE:</b> If you have upgraded at any time to v0.5.10, v0.6.x and you want to go back to a branch with v0.5.9 or v0.5.8, then you have to SSH into the Eon and edit the file /data/params/d/ControlsParams and rename "angle_model_bias" to "angle_offset" or your car will have Dash Errors and you'll be scratching your head for hours!
 
 <b>Pedal Users:</b> Also note that you need to flash your Pedal to go to v0.5.10.  If you want to go back to 0.5.9 or 0.5.8 you need to flash your pedal back to 0.5.9.  Instructions are here:  https://medium.com/@jfrux/comma-pedal-updating-the-firmware-over-can-fa438a3cf910.  Also. After you flash your Pedal..  All hell will break loose on your dash.  Traction control error, Power Steering Error, Trailer Error, OMFG the sky is falling error etc.  DON'T PANIC.  Just drive around a bit and it will disappear after about 2-3 restarts of the car.  Don't rush it I believe it's time dependent as well.  Just drive as normal.  They'll go away.
