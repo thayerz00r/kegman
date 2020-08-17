@@ -1,5 +1,5 @@
 Bolt EV setting value
-- sR_BP0": "3", "sR_BP1": "10", "sR_boost": "3.0", "sR_time": "2", "steerRateCost": "1.0",
+- sR_BP0": "4", "sR_BP1": "10", "sR_boost": "4.0", "sR_time": "2", "steerRateCost": "1.0",
 
 ** Note that Honda stock AEB is disabled in 0.7.5 because of occassional issues on double lane curved highways where stock AEB activates when oncoming car detected - in 0.7.4 Honda stock AEB is enabled because unsafe mode in panda was not available yet in devel**
 
