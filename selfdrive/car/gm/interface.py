@@ -95,17 +95,17 @@ class CarInterface(CarInterfaceBase):
 
     elif candidate == CAR.BOLT:
       # initial engage unkown - copied from Volt. Stop and go unknown.
-      ret.minEnableSpeed = 8 * CV.MPH_TO_MS
+      ret.minEnableSpeed = -1
       ret.mass = 1616. + STD_CARGO_KG
       ret.safetyModel = car.CarParams.SafetyModel.gm
       ret.wheelbase = 2.60096
-      ret.steerRatio = 12.0
+      ret.steerRatio = 16.8
       ret.steerRatioRear = 0.
       ret.centerToFront = ret.wheelbase * 0.4 # wild guess
       #Rav4 from Arnepilot
       ret.lateralTuning.init('lqr')
-      ret.lateralTuning.lqr.scale = 1500.0
-      ret.lateralTuning.lqr.ki = 0.05
+      ret.lateralTuning.lqr.scale = 2100.0
+      ret.lateralTuning.lqr.ki = 0.01
       ret.lateralTuning.lqr.a = [0., 1., -0.22619643, 1.21822268]
       ret.lateralTuning.lqr.b = [-1.92006585e-04, 3.95603032e-05]
       ret.lateralTuning.lqr.c = [1., 0.]
