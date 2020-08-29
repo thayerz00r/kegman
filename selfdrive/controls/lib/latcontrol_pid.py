@@ -11,7 +11,6 @@ class LatControlPID():
     self.deadzone = float(self.kegman.conf['deadzone'])
     self.pid = PIController((CP.lateralTuning.pid.kpBP, CP.lateralTuning.pid.kpV),
                             (CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV),
-                            (CP.lateralTuning.pid.kdBP, CP.lateralTuning.pid.kdV),
                             k_f=CP.lateralTuning.pid.kf, pos_limit=1.0, sat_limit=CP.steerLimitTimer)
     self.angle_steers_des = 0.
     self.mpc_frame = 0
