@@ -36,8 +36,8 @@ def create_gas_regen_command(packer, bus, throttle, idx, acc_engaged, at_full_st
 
 def create_friction_brake_command(packer, bus, apply_brake, idx, near_stop, at_full_stop):
 
-  
-  mode = 0x1  
+
+  mode = 0x1
   if apply_brake > 0:
     mode = 0xa
 
@@ -65,7 +65,7 @@ def create_friction_brake_command(packer, bus, apply_brake, idx, near_stop, at_f
 
 def create_acc_dashboard_command(packer, bus, acc_engaged, target_speed_kph, lead_car_in_sight, fcw, follow_level):
   # Not a bit shift, dash can round up based on low 4 bits.
-  target_speed = int(target_speed_kph * 16) & 0xfff
+  target_speed = int(target_speed_kph) & 0xfff
 
   values = {
     "ACCAlwaysOne" : 1,
