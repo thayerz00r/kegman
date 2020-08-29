@@ -1,4 +1,4 @@
-from selfdrive.controls.lib.pid import PIController
+from selfdrive.controls.lib.pid import LatPIDController
 from selfdrive.controls.lib.drive_helpers import get_steer_max
 from cereal import car
 from cereal import log
@@ -9,9 +9,10 @@ class LatControlPID():
   def __init__(self, CP):
     self.kegman = kegman_conf(CP)
     self.deadzone = float(self.kegman.conf['deadzone'])
-    self.pid = PIController((CP.lateralTuning.pid.kpBP, CP.lateralTuning.pid.kpV),
-                            (CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV),
-                            k_f=CP.lateralTuning.pid.kf, pos_limit=1.0, sat_limit=CP.steerLimitTimer)
+    self.pid = LatPIController((CP.lateralTuning.pid.kpBP, CP.lateralTuning.pid.kpV),
+                               (CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV),
+                               (CP.lateralTuning.pid.kdBP, CP.lateralTuning.pid.kdV),
+                               k_f=CP.lateralTuning.pid.kf, pos_limit=1.0, sat_limit=CP.steerLimitTimer)
     self.angle_steers_des = 0.
     self.mpc_frame = 0
 
