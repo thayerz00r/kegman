@@ -1,6 +1,6 @@
 import numpy as np
 from selfdrive.controls.lib.drive_helpers import get_steer_max
-from common.numpy_fast import clip
+from common.numpy_fast import clip, interp
 from common.realtime import DT_CTRL
 from cereal import log
 
@@ -9,6 +9,9 @@ class LatControlLQR():
   def __init__(self, CP):
     self.scale = CP.lateralTuning.lqr.scale
     self.ki = CP.lateralTuning.lqr.ki
+    self.scale_add = [500, 0.]
+    self.scaleBP = [10., 25.]
+    self.scale_add_new = 0.0
 
     self.A = np.array(CP.lateralTuning.lqr.a).reshape((2, 2))
     self.B = np.array(CP.lateralTuning.lqr.b).reshape((2, 1))
@@ -52,8 +55,8 @@ class LatControlLQR():
     steering_angle = CS.steeringAngle
 
     # Subtract offset. Zero angle should correspond to zero torque
-    self.angle_steers_des = path_plan.angleSteers - path_plan.angleOffset
-    steering_angle -= path_plan.angleOffset
+    self.angle_steers_des = path_plan.angleSteers #- path_plan.angleOffset
+    #steering_angle -= path_plan.angleOffset
 
     # Update Kalman filter
     angle_steers_k = float(self.C.dot(self.x_hat))
@@ -68,8 +71,9 @@ class LatControlLQR():
       lqr_log.active = True
 
       # LQR
+      self.scale_add_new = interp(CS.vEgo, self.scaleBP, self.scale_add)
       u_lqr = float(self.angle_steers_des / self.dc_gain - self.K.dot(self.x_hat))
-      lqr_output = torque_scale * u_lqr / self.scale
+      lqr_output = torque_scale * u_lqr / (self.scale + self.scale_add_new)
 
       # Integrator
       if CS.steeringPressed:
