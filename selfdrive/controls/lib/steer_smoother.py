@@ -12,4 +12,5 @@ class SteerSmoother():
       self.data_steer[1] = self.data_rst #self.data_rst 값을 취함에 주의
     else:
       self.data_rst = steer_angle_dest
+      
     return self.data_rst
