@@ -3,6 +3,7 @@ from selfdrive.controls.lib.drive_helpers import get_steer_max
 from cereal import car
 from cereal import log
 from selfdrive.kegman_conf import kegman_conf
+from selfdrive.controls.lib.steer_smoother import SteerSmoother
 
 
 class LatControlPID():
@@ -49,7 +50,12 @@ class LatControlPID():
       pid_log.active = False
       self.pid.reset()
     else:
-      self.angle_steers_des = path_plan.angleSteers  # get from MPC/PathPlanner
+      if CS.vEgo < 10.0:
+        self.angle_steers_des = SteerSmoother.get_data(path_plan.angleSteers, 3, 0.5)
+      elif CS.vEgo < 15.0:
+        self.angle_steers_des = SteerSmoother.get_data(path_plan.angleSteers, 3, 0.8)
+      else:
+        self.angle_steers_des = path_plan.angleSteers  # get from MPC/PathPlanner
 
       steers_max = get_steer_max(CP, CS.vEgo)
       self.pid.pos_limit = steers_max
