@@ -15,6 +15,7 @@ class LatControlPID():
                                 k_f=CP.lateralTuning.pid.kf, pos_limit=1.0, neg_limit=-1.0,
                                 sat_limit=CP.steerLimitTimer)
     self.angle_steers_des = 0.
+    self.angle_steers_des_last = 0.
     self.mpc_frame = 0
 
   def reset(self):
@@ -50,11 +51,17 @@ class LatControlPID():
       self.pid.reset()
     else:
       self.angle_steers_des = path_plan.angleSteers  # get from MPC/PathPlanner
+      check_pingpong = abs(self.angle_steers_des - self.angle_steers_des_last) > 5.0
+      if CS.vEgo < 10.0 and check_pingpong:
+        self.angle_steers_des = path_plan.angleSteers * 0.5
+      elif CS.vEgo < 15.0 and check_pingpong:
+        self.angle_steers_des = path_plan.angleSteers * 0.8
 
       steers_max = get_steer_max(CP, CS.vEgo)
       self.pid.pos_limit = steers_max
       self.pid.neg_limit = -steers_max
       steer_feedforward = self.angle_steers_des   # feedforward desired angle
+      self.angle_steers_des_last = self.angle_steers_des
       if CP.steerControlType == car.CarParams.SteerControlType.torque:
         # TODO: feedforward something based on path_plan.rateSteers
         #steer_feedforward -= path_plan.angleOffset   # subtract the offset, since it does not contribute to resistive torque
