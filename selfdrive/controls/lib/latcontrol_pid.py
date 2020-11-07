@@ -51,10 +51,14 @@ class LatControlPID():
       self.pid.reset()
     else:
       self.angle_steers_des = path_plan.angleSteers  # get from MPC/PathPlanner
-      check_pingpong = abs(self.angle_steers_des - self.angle_steers_des_last) > 5.0
+      check_pingpong = abs(self.angle_steers_des - self.angle_steers_des_last) > 3.0
       if CS.vEgo < 10.0 and check_pingpong:
-        self.angle_steers_des = path_plan.angleSteers * 0.5
+        self.angle_steers_des = path_plan.angleSteers * 0.3
       elif CS.vEgo < 15.0 and check_pingpong:
+        self.angle_steers_des = path_plan.angleSteers * 0.45
+      elif CS.vEgo < 20.0 and check_pingpong:
+        self.angle_steers_des = path_plan.angleSteers * 0.6
+      elif CS.vEgo < 25.0 and check_pingpong:
         self.angle_steers_des = path_plan.angleSteers * 0.8
 
       steers_max = get_steer_max(CP, CS.vEgo)
@@ -64,7 +68,7 @@ class LatControlPID():
       self.angle_steers_des_last = self.angle_steers_des
       if CP.steerControlType == car.CarParams.SteerControlType.torque:
         # TODO: feedforward something based on path_plan.rateSteers
-        #steer_feedforward -= path_plan.angleOffset   # subtract the offset, since it does not contribute to resistive torque
+        steer_feedforward -= path_plan.angleOffset   # subtract the offset, since it does not contribute to resistive torque
         steer_feedforward *= CS.vEgo**2  # proportional to realigning tire momentum (~ lateral accel)
 
       deadzone = self.deadzone
