@@ -7,8 +7,8 @@ kegman = kegman_conf()
 CAMERA_OFFSET = float(kegman.conf['cameraOffset'])  # m from center car to camera
 
 #zorrobyte
-def mean(numbers): 
-     return float(sum(numbers)) / max(len(numbers), 1) 
+def mean(numbers):
+     return float(sum(numbers)) / max(len(numbers), 1)
 
 
 
@@ -49,6 +49,11 @@ def calc_d_poly(l_poly, r_poly, p_poly, l_prob, r_prob, lane_width, v_ego):
 
   lr_prob = l_prob + r_prob - l_prob * r_prob
 
+  if lr_prob > 0.65:
+    lr_prob = min(lr_prob * 1.35, 1.0)
+  elif lr_prob > 0.36:
+    lr_prob = min(lr_prob * 1.625, 0.93)
+
   d_poly_lane = (l_prob * path_from_left_lane + r_prob * path_from_right_lane) / (l_prob + r_prob + 0.0001)
   return lr_prob * d_poly_lane + (1.0 - lr_prob) * p_poly
 
@@ -67,7 +72,7 @@ class LanePlanner():
     self.lane_width = 2.85
     self.readings = []
     self.frame = 0
-    
+
     self.l_prob = 0.
     self.r_prob = 0.
 
@@ -123,7 +128,7 @@ class LanePlanner():
     # Don't exit dive
     if abs(self.l_poly[3] - self.r_poly[3]) > self.lane_width:
       self.r_prob = self.r_prob / interp(self.l_prob, [0, 1], [1, 3])
-    
+
 
     self.d_poly = calc_d_poly(self.l_poly, self.r_poly, self.p_poly, self.l_prob, self.r_prob, self.lane_width, v_ego)
 
