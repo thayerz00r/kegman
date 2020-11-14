@@ -237,6 +237,7 @@ void update_sockets(UIState *s) {
       }
     }
   }
+}
 
 void ui_update(UIState *s) {
 
