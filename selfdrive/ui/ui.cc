@@ -118,7 +118,6 @@ void update_sockets(UIState *s) {
 
   if (s->started && sm.updated("controlsState")) {
     auto event = sm["controlsState"];
-    //auto data = event.getControlsState();
     scene.controls_state = event.getControlsState();
 
     // TODO: the alert stuff shouldn't be handled here
@@ -237,6 +236,8 @@ void update_sockets(UIState *s) {
       }
     }
   }
+
+  s->started = scene.thermal.getStarted() || scene.frontview;
 }
 
 void ui_update(UIState *s) {
@@ -249,6 +250,7 @@ void ui_update(UIState *s) {
     s->status = STATUS_OFFROAD;
     s->active_app = cereal::UiLayoutState::App::HOME;
     s->scene.uilayout_sidebarcollapsed = false;
+    s->sound->stop();
   } else if (s->started && s->status == STATUS_OFFROAD) {
     s->status = STATUS_DISENGAGED;
     s->started_frame = s->sm->frame;

@@ -33,7 +33,6 @@
 #define COLOR_WHITE_ALPHA(x) nvgRGBA(255, 255, 255, x)
 #define COLOR_YELLOW nvgRGBA(218, 202, 37, 255)
 #define COLOR_RED nvgRGBA(201, 34, 49, 255)
-#define COLOR_RED_ALPHA(x) nvgRGBA(201, 34, 49, x)
 
 #define UI_BUF_COUNT 4
 
@@ -153,7 +152,6 @@ typedef struct UIState {
   NVGcontext *vg;
 
   // fonts and images
-  int font_courbd;
   int font_sans_regular;
   int font_sans_semibold;
   int font_sans_bold;
