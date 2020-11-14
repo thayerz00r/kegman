@@ -16,8 +16,6 @@ extern "C"{
 
 #include "paint.hpp"
 #include "sidebar.hpp"
-#include "paint_dp.hpp"
-
 
 // TODO: this is also hardcoded in common/transformations/camera.py
 // TODO: choose based on frame input size
