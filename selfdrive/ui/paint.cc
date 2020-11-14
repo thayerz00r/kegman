@@ -6,7 +6,6 @@
 #include "common/util.h"
 #include <algorithm>
 
-
 #define NANOVG_GLES3_IMPLEMENTATION
 #include "nanovg_gl.h"
 #include "nanovg_gl_utils.h"
@@ -17,7 +16,6 @@ extern "C"{
 
 #include "paint.hpp"
 #include "sidebar.hpp"
-
 
 // TODO: this is also hardcoded in common/transformations/camera.py
 // TODO: choose based on frame input size
@@ -53,9 +51,8 @@ bool car_space_to_full_frame(const UIState *s, float in_x, float in_y, float in_
   *out_x = KEp.v[0] / KEp.v[2];
   *out_y = KEp.v[1] / KEp.v[2];
 
-  return *out_x >= 0 && *out_x <= s->fb_w && *out_y >= 0 && *out_y <= s->fb_h;
+  return *out_x >= 0 && *out_y >= 0;
 }
-
 
 static void ui_draw_text(NVGcontext *vg, float x, float y, const char* string, float size, NVGcolor color, int font){
   nvgFontFaceId(vg, font);
@@ -133,9 +130,9 @@ static void ui_draw_line(UIState *s, const vertex_data *v, const int cnt, NVGcol
   if (cnt == 0) return;
 
   nvgBeginPath(s->vg);
-  nvgMoveTo(s->vg, v[0].x, v[0].y);
+  nvgMoveTo(s->vg, std::clamp<float>(v[0].x, 0, s->fb_w), std::clamp<float>(v[0].y, 0, s->fb_h));
   for (int i = 1; i < cnt; i++) {
-    nvgLineTo(s->vg, v[i].x, v[i].y);
+    nvgLineTo(s->vg, std::clamp<float>(v[i].x, 0, s->fb_w), std::clamp<float>(v[i].y, 0, s->fb_h));
   }
   nvgClosePath(s->vg);
   if (color) {
@@ -234,7 +231,7 @@ static void ui_draw_vision_lane_lines(UIState *s) {
     NVGcolor color = nvgRGBAf(1.0, 1.0, 1.0, scene->lane_line_probs[ll_idx]);
     ui_draw_line(s, (pvd_ll + ll_idx)->v, (pvd_ll + ll_idx)->cnt, &color, nullptr);
   }
-  
+
   // paint road edges
   line_vertices_data *pvd_re = &s->road_edge_vertices[0];
   for (int re_idx = 0; re_idx < 2; re_idx++) {
@@ -244,7 +241,7 @@ static void ui_draw_vision_lane_lines(UIState *s) {
     NVGcolor color = nvgRGBAf(1.0, 0.0, 0.0, std::clamp<float>(1.0-scene->road_edge_stds[re_idx], 0.0, 1.0));
     ui_draw_line(s, (pvd_re + re_idx)->v, (pvd_re + re_idx)->cnt, &color, nullptr);
   }
-  
+
   // paint path
   if(s->sm->updated("modelV2")) {
     update_track_data(s, scene->model.getPosition(), &s->track_vertices);
@@ -257,9 +254,7 @@ static void ui_draw_world(UIState *s) {
   const UIScene *scene = &s->scene;
 
   nvgSave(s->vg);
-
-  // Don't draw on top of sidebar
-  nvgScissor(s->vg, scene->viz_rect.x, scene->viz_rect.y, scene->viz_rect.w, scene->viz_rect.h);
+  nvgScissor(s->vg, s->video_rect.x, s->video_rect.y, s->video_rect.w, s->video_rect.h);
 
   // Apply transformation such that video pixel coordinates match video
   // 1) Put (0, 0) in the middle of the video
@@ -428,7 +423,6 @@ static void ui_draw_vision_header(UIState *s) {
                         viz_rect.y+(header_h-(header_h/2.5)),
                         viz_rect.x, viz_rect.y+header_h,
                         nvgRGBAf(0,0,0,0.45), nvgRGBAf(0,0,0,0));
-
   ui_draw_rect(s->vg, viz_rect.x, viz_rect.y, viz_rect.w, header_h, gradient);
 
   ui_draw_vision_maxspeed(s);
@@ -446,34 +440,34 @@ void ui_draw_vision_alert(UIState *s, cereal::ControlsState::AlertSize va_size, 
       {cereal::ControlsState::AlertSize::NONE, 0},
       {cereal::ControlsState::AlertSize::SMALL, 241},
       {cereal::ControlsState::AlertSize::MID, 390},
-      {cereal::ControlsState::AlertSize::FULL, s->fb_h}};
+      {cereal::ControlsState::AlertSize::FULL, s->fb_h - 150}};
 
   const UIScene *scene = &s->scene;
-  bool longAlert1 = strlen(va_text1) > 15;
+  bool longAlert1 = true;
 
   NVGcolor color = bg_colors[va_color];
   color.a *= s->alert_blinking_alpha;
   int alr_s = alert_size_map[va_size];
 
-  const int alr_x = scene->viz_rect.x - bdr_s;
-  const int alr_w = scene->viz_rect.w + (bdr_s*2);
-  const int alr_h = alr_s+(va_size==cereal::ControlsState::AlertSize::NONE?0:bdr_s);
-  const int alr_y = s->fb_h-alr_h;
+  const int alr_x = scene->viz_rect.x - bdr_s + 100;
+  const int alr_w = scene->viz_rect.w + (bdr_s*2) - 200;
+  const int alr_h = alr_s+(va_size==cereal::ControlsState::AlertSize::NONE?0:bdr_s) - 100;
+  const int alr_y = s->fb_h-alr_h - 100;
 
-  ui_draw_rect(s->vg, alr_x, alr_y, alr_w, alr_h, color);
+  ui_draw_rect(s->vg, alr_x, alr_y, alr_w, alr_h, color, 20);
 
   NVGpaint gradient = nvgLinearGradient(s->vg, alr_x, alr_y, alr_x, alr_y+alr_h,
                                         nvgRGBAf(0.0,0.0,0.0,0.05), nvgRGBAf(0.0,0.0,0.0,0.35));
-  ui_draw_rect(s->vg, alr_x, alr_y, alr_w, alr_h, gradient);
+  ui_draw_rect(s->vg, alr_x, alr_y, alr_w, alr_h, gradient, 20);
 
   nvgFillColor(s->vg, COLOR_WHITE);
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
 
   if (va_size == cereal::ControlsState::AlertSize::SMALL) {
-    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2+15, va_text1, 40*2.5, COLOR_WHITE, s->font_sans_semibold);
+    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2+15, va_text1, 32*2.5, COLOR_WHITE, s->font_sans_semibold);
   } else if (va_size == cereal::ControlsState::AlertSize::MID) {
-    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2-45, va_text1, 48*2.5, COLOR_WHITE, s->font_sans_bold);
-    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2+75, va_text2, 36*2.5, COLOR_WHITE, s->font_sans_regular);
+    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2-45, va_text1, 40*2.5, COLOR_WHITE, s->font_sans_bold);
+    ui_draw_text(s->vg, alr_x+alr_w/2, alr_y+alr_h/2+75, va_text2, 28*2.5, COLOR_WHITE, s->font_sans_regular);
   } else if (va_size == cereal::ControlsState::AlertSize::FULL) {
     nvgFontSize(s->vg, (longAlert1?72:96)*2.5);
     nvgFontFaceId(s->vg, s->font_sans_bold);
@@ -482,7 +476,7 @@ void ui_draw_vision_alert(UIState *s, cereal::ControlsState::AlertSize va_size, 
     nvgFontSize(s->vg, 48*2.5);
     nvgFontFaceId(s->vg,  s->font_sans_regular);
     nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BOTTOM);
-    nvgTextBox(s->vg, alr_x, alr_h-(longAlert1?300:360), alr_w-60, va_text2, NULL);
+    nvgTextBox(s->vg, alr_x, alr_h-(longAlert1?150:210), alr_w-60, va_text2, NULL);
   }
 }
 
@@ -629,7 +623,8 @@ void ui_nvg_init(UIState *s) {
 #endif
 
   assert(s->vg);
-
+  s->font_courbd = nvgCreateFont(s->vg, "courbd", "../assets/fonts/courbd.ttf");
+  assert(s->font_courbd >= 0);
   s->font_sans_regular = nvgCreateFont(s->vg, "sans-regular", "../assets/fonts/opensans_regular.ttf");
   assert(s->font_sans_regular >= 0);
   s->font_sans_semibold = nvgCreateFont(s->vg, "sans-semibold", "../assets/fonts/opensans_semibold.ttf");
