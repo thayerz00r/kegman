@@ -19,8 +19,8 @@ EventName = car.CarEvent.EventName
 
 _AWARENESS_TIME = 35.  # passive wheel touch total timeout
 #_AWARENESS_TIME = min(int(kegman.conf['wheelTouchSeconds']), 600)    # x minutes limit without user touching steering wheels make the car enter a terminal status
-_AWARENESS_PRE_TIME_TILL_TERMINAL = 7.
-_AWARENESS_PROMPT_TIME_TILL_TERMINAL = 5.
+_AWARENESS_PRE_TIME_TILL_TERMINAL = 12.
+_AWARENESS_PROMPT_TIME_TILL_TERMINAL = 6.
 
 _DISTRACTED_TIME = 11.
 _DISTRACTED_PRE_TIME_TILL_TERMINAL = 8.
