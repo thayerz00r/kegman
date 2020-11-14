@@ -33,6 +33,7 @@
 #define COLOR_WHITE_ALPHA(x) nvgRGBA(255, 255, 255, x)
 #define COLOR_YELLOW nvgRGBA(218, 202, 37, 255)
 #define COLOR_RED nvgRGBA(201, 34, 49, 255)
+#define COLOR_RED_ALPHA(x) nvgRGBA(201, 34, 49, x)
 
 #define UI_BUF_COUNT 4
 
@@ -47,8 +48,7 @@ typedef struct Rect {
 } Rect;
 
 const int sbr_w = 300;
-const int bdr_s = 10;
-const int bdr_is = 30;
+const int bdr_s = 30;
 const int header_h = 420;
 const int footer_h = 280;
 const Rect settings_btn = {50, 35, 200, 117};
@@ -56,9 +56,8 @@ const Rect home_btn = {60, 1080 - 180 - 40, 180, 180};
 
 const int UI_FREQ = 20;   // Hz
 
-const int MODEL_PATH_MAX_VERTICES_CNT = 98;
-const int MODEL_LANE_PATH_CNT = 2;
-const int TRACK_POINTS_MAX_CNT = 50 * 2;
+const int MODEL_PATH_MAX_VERTICES_CNT = TRAJECTORY_SIZE*2;
+const int TRACK_POINTS_MAX_CNT = TRAJECTORY_SIZE*4;
 
 const int SET_SPEED_NA = 255;
 
@@ -84,10 +83,14 @@ static std::map<UIStatus, NVGcolor> bg_colors = {
   {STATUS_ALERT, nvgRGBA(0xC9, 0x22, 0x31, 0xf1)},
 };
 
-typedef struct UIScene {
+typedef struct {
+  float x[TRAJECTORY_SIZE];
+  float y[TRAJECTORY_SIZE];
+  float z[TRAJECTORY_SIZE];
+} line;
 
-  float mpc_x[50];
-  float mpc_y[50];
+
+typedef struct UIScene {
 
   mat4 extrinsic_matrix;      // Last row is 0 so we can use mat4.
   bool world_objects_visible;
@@ -99,27 +102,10 @@ typedef struct UIScene {
   Rect viz_rect;
   int ui_viz_ro;
 
-  int lead_status;
-  float lead_d_rel, lead_v_rel;
-
   std::string alert_text1;
   std::string alert_text2;
   std::string alert_type;
   cereal::ControlsState::AlertSize alert_size;
-
-  float angleSteers;
-  bool brakeLights;
-  float angleSteersDes;
-  bool recording;
-  float gpsAccuracyUblox;
-  float altitudeUblox;
-  int engineRPM;
-  bool steerOverride;
-  float output_scale;
-  float steeringTorqueEps;
-  float aEgo;
-  float cpuTemp;
-  int cpuPerc;
 
   cereal::HealthData::HwType hwType;
   int satelliteCount;
@@ -130,10 +116,17 @@ typedef struct UIScene {
   cereal::ControlsState::Reader controls_state;
   cereal::DriverState::Reader driver_state;
   cereal::DMonitoringState::Reader dmonitoring_state;
-  cereal::ModelData::Reader model;
-  float left_lane_points[MODEL_PATH_DISTANCE];
-  float path_points[MODEL_PATH_DISTANCE];
-  float right_lane_points[MODEL_PATH_DISTANCE];
+  cereal::ModelDataV2::Reader model;
+  line path;
+  line outer_left_lane_line;
+  line left_lane_line;
+  line right_lane_line;
+  line outer_right_lane_line;
+  line left_road_edge;
+  line right_road_edge;
+  float max_distance;
+  float lane_line_probs[4];
+  float road_edge_stds[2];
 } UIScene;
 
 typedef struct {
@@ -143,7 +136,7 @@ typedef struct {
 typedef struct {
   vertex_data v[MODEL_PATH_MAX_VERTICES_CNT];
   int cnt;
-} model_path_vertices_data;
+} line_vertices_data;
 
 typedef struct {
   vertex_data v[TRACK_POINTS_MAX_CNT];
@@ -160,6 +153,7 @@ typedef struct UIState {
   NVGcontext *vg;
 
   // fonts and images
+  int font_courbd;
   int font_sans_regular;
   int font_sans_semibold;
   int font_sans_bold;
@@ -171,7 +165,6 @@ typedef struct UIState {
   int img_battery;
   int img_battery_charging;
   int img_network[6];
-  int img_brake;
 
   SubMaster *sm;
 
@@ -209,8 +202,9 @@ typedef struct UIState {
   bool alert_blinked;
   float alert_blinking_alpha;
 
-  track_vertices_data track_vertices[2];
-  model_path_vertices_data model_path_vertices[MODEL_LANE_PATH_CNT * 2];
+  track_vertices_data track_vertices;
+  line_vertices_data lane_line_vertices[4];
+  line_vertices_data road_edge_vertices[2];
 
   Rect video_rect;
 } UIState;
