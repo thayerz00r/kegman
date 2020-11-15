@@ -3,6 +3,7 @@ from selfdrive.controls.lib.drive_helpers import get_steer_max
 from cereal import car
 from cereal import log
 from selfdrive.kegman_conf import kegman_conf
+from common.numpy_fast import interp
 
 
 class LatControlPID():
@@ -17,6 +18,11 @@ class LatControlPID():
     self.angle_steers_des = 0.
     self.angle_steers_des_last = 0.
     self.mpc_frame = 0
+
+    self.angle_steer_rate = [0.3, 0.8, 1.0]
+    self.angleBP = [10., 25., 27.0]
+    self.angle_steer_new = 0.0
+
 
   def reset(self):
     self.pid.reset()
@@ -51,15 +57,10 @@ class LatControlPID():
       self.pid.reset()
     else:
       self.angle_steers_des = path_plan.angleSteers  # get from MPC/PathPlanner
+      self.angle_steer_new = interp(CS.vEgo, self.angleBP, self.angle_steer_rate)
       check_pingpong = abs(self.angle_steers_des - self.angle_steers_des_last) > 3.0
-      if CS.vEgo < 10.0 and check_pingpong:
-        self.angle_steers_des = path_plan.angleSteers * 0.3
-      elif CS.vEgo < 15.0 and check_pingpong:
-        self.angle_steers_des = path_plan.angleSteers * 0.45
-      elif CS.vEgo < 20.0 and check_pingpong:
-        self.angle_steers_des = path_plan.angleSteers * 0.6
-      elif CS.vEgo < 25.0 and check_pingpong:
-        self.angle_steers_des = path_plan.angleSteers * 0.8
+      if check_pingpong:
+        self.angle_steers_des = path_plan.angleSteers * self.angle_steer_new
 
       steers_max = get_steer_max(CP, CS.vEgo)
       self.pid.pos_limit = steers_max
