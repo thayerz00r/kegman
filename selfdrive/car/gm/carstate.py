@@ -76,6 +76,13 @@ class CarState(CarStateBase):
     if self.car_fingerprint == CAR.VOLT or self.car_fingerprint == CAR.BOLT:
       self.regen_pressed = bool(pt_cp.vl["EBCMRegenPaddle"]['RegenPaddle'])
 
+    brake_light_enable = False
+    if self.car_fingerprint == CAR.BOLT:
+      if ret.aEgo < -1.3:
+        brake_light_enable = True
+
+    ret.brakeLights = ret.brakePressed or self.regen_pressed or brake_light_enable
+
     ret.cruiseState.available = self.main_on
     ret.cruiseState.enabled = self.pcm_acc_status != 0
     ret.cruiseState.standstill = False

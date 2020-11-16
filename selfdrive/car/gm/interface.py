@@ -225,8 +225,8 @@ class CarInterface(CarInterfaceBase):
       events.add(EventName.belowEngageSpeed)
     if self.CS.park_brake:
       events.add(EventName.parkBrake)
-    if self.CS.regen_pressed:
-      events.add(EventName.steerTempUnavailableMute)
+    #if self.CS.regen_pressed:
+     # events.add(EventName.steerTempUnavailableMute)
 
     # handle button presses
     for b in ret.buttonEvents:
