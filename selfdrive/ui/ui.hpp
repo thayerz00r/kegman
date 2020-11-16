@@ -91,6 +91,8 @@ typedef struct {
 
 
 typedef struct UIScene {
+  float mpc_x[50];
+  float mpc_y[50];
 
   mat4 extrinsic_matrix;      // Last row is 0 so we can use mat4.
   bool world_objects_visible;
