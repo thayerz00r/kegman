@@ -200,6 +200,7 @@ class Localizer():
     if np.linalg.norm(ecef_vel) > 5 and np.linalg.norm(orientation_error) > 1:
       cloudlog.error("Locationd vs ubloxLocation orientation difference too large, kalman reset")
       self.reset_kalman(init_pos=ecef_pos, init_orient=initial_pose_ecef_quat)
+      self.update_kalman(current_time, ObservationKind.ECEF_ORIENTATION_FROM_GPS, initial_pose_ecef_quat)
     elif gps_est_error > 50:
       cloudlog.error("Locationd vs ubloxLocation position difference too large, kalman reset")
       self.reset_kalman(init_pos=ecef_pos, init_orient=initial_pose_ecef_quat)
