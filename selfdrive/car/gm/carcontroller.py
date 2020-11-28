@@ -44,6 +44,7 @@ class CarController():
     self.apply_steer_last = 0
     self.lka_icon_status_last = (False, False)
     self.steer_rate_limited = False
+    self.cruise_sw_cnt = 0
 
     self.params = CarControllerParams()
 
@@ -75,14 +76,23 @@ class CarController():
 
     #Cruise SW
     if (frame % 20) == 0:
-      if enabled:
-        if CS.out.stockCruise and self.CS.cruise_inc > 0:
-          can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, 2))
-          self.CS.cruise_inc -= 1
 
-        if CS.out.stockCruise and self.CS.cruise_dec > 0:
-          can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, 3))
-          self.CS.cruise_dec -= 1
+      if CS.cruise_inc:
+        self.cruise_sw_cnt = -5
+      elif CS.cruise_dec:
+        self.cruise_sw_cnt = 5
+
+      if not enabled or not CS.out.stockCruise:
+          self.cruise_sw_cnt = 0
+      elif enabled and CS.out.stockCruise:
+        if self.cruise_sw_cnt < 0:
+          acc_buttons = 2
+          can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_buttons))
+          self.cruise_sw_cnt += 1
+        elif self.cruise_sw_cnt > 0:
+          acc_buttons = 3
+          can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_buttons))
+          self.cruise_sw_cnt -= 1
 
     # GAS/BRAKE
     # no output if not enabled, but keep sending keepalive messages
