@@ -235,7 +235,7 @@ class CarInterface(CarInterfaceBase):
     if ret.cruiseState.enabled and self.CS.main_on:
       for b in ret.buttonEvents:       # handle button presses
         if not self.CS.stock_cruise_prev and ret.vEgo > 12.0:
-          if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
+          if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and b.pressed:
             self.CS.stock_cruise = True
         elif self.CS.stock_cruise_prev:
           if b.type == ButtonType.cancel and b.pressed:           # do disable on button down
