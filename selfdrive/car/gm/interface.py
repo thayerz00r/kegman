@@ -202,11 +202,11 @@ class CarInterface(CarInterfaceBase):
         but = self.CS.prev_cruise_buttons
       if but == CruiseButtons.RES_ACCEL:
         be.type = ButtonType.accelCruise  # Suppress resume button if we're resuming from stop so we don't adjust speed.
-        if self.CS.stock_cruise = True:
+        if self.CS.stock_cruise == True:
           self.CS.cruise_inc = 5
       elif but == CruiseButtons.DECEL_SET:
         be.type = ButtonType.decelCruise
-        if self.CS.stock_cruise = True:
+        if self.CS.stock_cruise == True:
           self.CS.cruise_dec = 5
       elif but == CruiseButtons.CANCEL:
         be.type = ButtonType.cancel

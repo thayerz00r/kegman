@@ -77,14 +77,14 @@ class CarController():
     if enabled and CS.out.stockCruise:
         if self.CS.cruise_inc != 0:
           self.CS.cruise_sw_timer += 1
-          if self.CS.cruise_sw_timer = 300:
+          if self.CS.cruise_sw_timer == 300:
             can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, 2))
             self.CS.cruise_sw_timer = 0
             self.CS.cruise_inc -= 0
 
         if self.CS.cruise_dec != 0:
           self.CS.cruise_sw_timer += 1
-          if self.CS.cruise_sw_timer = 300:
+          if self.CS.cruise_sw_timer == 300:
             can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, 3))
             self.CS.cruise_sw_timer = 0
             self.CS.cruise_dec -= 0
