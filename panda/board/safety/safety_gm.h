@@ -88,22 +88,6 @@ static int gm_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   if (valid && (GET_BUS(to_push) == 0)) {
     int addr = GET_ADDR(to_push);
 
-    if (board_has_relay() && !gm_relay_open) {
-      if (addr == 384) {
-        int rolling_counter = GET_BYTE(to_push, 0) >> 4;
-        if (rolling_counter == 0) {
-          gm_lkas_buffer.rolling_counter = 3;
-        }
-        else {
-          gm_lkas_buffer.rolling_counter = rolling_counter - 1;
-        }
-        set_intercept_relay(true);
-        heartbeat_counter = 0U;
-        gm_relay_open = true;
-      }
-      return 0;
-    }
-
     if (addr == 388) {
       int torque_driver_new = ((GET_BYTE(to_push, 6) & 0x7) << 8) | GET_BYTE(to_push, 7);
       torque_driver_new = to_signed(torque_driver_new, 11);
@@ -169,7 +153,6 @@ static int gm_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
 //     block all commands that produce actuation
 
 static int gm_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
-  if (board_has_relay() && !gm_relay_open) return 0; //for now, when relay is closed we don't want to do anything
 
   int tx = 1;
   int addr = GET_ADDR(to_send);
@@ -279,7 +262,6 @@ static int gm_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
 }
 
 static int gm_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
-  if (board_has_relay() && !gm_relay_open) return 0; //for now, when relay is closed we don't want to do anything
 
   int bus_fwd = -1;
   if (bus_num == 0) {
