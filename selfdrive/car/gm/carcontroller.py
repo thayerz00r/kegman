@@ -76,11 +76,11 @@ class CarController():
     #Cruise SW
     if (frame % 20) == 0:
       if enabled:
-        if CS.out.stockCruise and self.CS.cruise_inc < 1:
+        if CS.out.stockCruise and self.CS.cruise_inc > 0:
           can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, 2))
           self.CS.cruise_inc -= 1
 
-        if CS.out.stockCruise and self.CS.cruise_dec < 1:
+        if CS.out.stockCruise and self.CS.cruise_dec > 0:
           can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, 3))
           self.CS.cruise_dec -= 1
 
