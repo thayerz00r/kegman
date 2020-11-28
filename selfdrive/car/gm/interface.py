@@ -241,7 +241,7 @@ class CarInterface(CarInterfaceBase):
           if b.type == ButtonType.cancel and b.pressed:           # do disable on button down
             self.CS.stock_cruise = False
 
-      if self.CS.regen_pressed:
+      if self.CS.stock_cruise_prev and self.CS.regen_pressed:
         self.CS.stock_cruise = False
 
     elif not self.CS.main_on:
