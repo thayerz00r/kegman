@@ -20,6 +20,13 @@ class CarState(CarStateBase):
     self.distance_button = 0
     self.follow_level = 3
     self.engineRPM = 0
+    self.stock_cruise = False
+    self.stock_cruise_prev = False
+    self.cruise_inc = 0
+    self.cruise_inc_cnt = 0
+    self.cruise_dec = 0
+    self.cruise_dec_cnt = 0
+    self.cruise_sw_timer = 0
 
   def update(self, pt_cp):
     ret = car.CarState.new_message()
@@ -92,6 +99,8 @@ class CarState(CarStateBase):
 
     ret.steeringTorqueEps = pt_cp.vl["PSCMStatus"]['LKATorqueDelivered']
     self.engineRPM = pt_cp.vl["ECMEngineStatus"]['EngineRPM']
+
+    ret.stockCruise = self.stock_cruise
 
     return ret
 

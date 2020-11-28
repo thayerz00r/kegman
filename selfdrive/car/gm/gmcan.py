@@ -80,6 +80,17 @@ def create_acc_dashboard_command(packer, bus, acc_engaged, target_speed_kph, lea
 
   return packer.make_can_msg("ASCMActiveCruiseControlStatus", bus, values)
 
+def create_cruise_sw_command(packer, bus, acc_buttons):
+
+  values = {
+    "DistanceButton" : 0,
+    "LKAButton" : 0,
+    "ACCButtons" : acc_buttons,
+    "DriveModeButton" : 0
+  }
+
+  return packer.make_can_msg("ASCMSteeringButton", bus, values)
+
 def create_adas_time_status(bus, tt, idx):
   dat = [(tt >> 20) & 0xff, (tt >> 12) & 0xff, (tt >> 4) & 0xff,
     ((tt & 0xf) << 4) + (idx << 2)]

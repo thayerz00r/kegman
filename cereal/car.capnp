@@ -161,6 +161,7 @@ struct CarState {
 
   # cruise state
   cruiseState @10 :CruiseState;
+  stockCruise @42 :Bool;
 
   # gear
   gearShifter @14 :GearShifter;

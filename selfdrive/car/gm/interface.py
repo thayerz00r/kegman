@@ -63,7 +63,7 @@ class CarInterface(CarInterfaceBase):
     ret = CarInterfaceBase.get_std_params(candidate, fingerprint, has_relay)
     ret.carName = "gm"
     ret.safetyModel = car.CarParams.SafetyModel.gm
-    ret.enableCruise = False  # stock cruise control is kept off
+    #ret.enableCruise = False  # stock cruise control is kept off
 
     # GM port is a community feature
     # TODO: make a port that uses a car harness and it only intercepts the camera
@@ -202,10 +202,16 @@ class CarInterface(CarInterfaceBase):
         but = self.CS.prev_cruise_buttons
       if but == CruiseButtons.RES_ACCEL:
         be.type = ButtonType.accelCruise  # Suppress resume button if we're resuming from stop so we don't adjust speed.
+        if self.CS.stock_cruise = True:
+          self.CS.cruise_inc = 5
       elif but == CruiseButtons.DECEL_SET:
         be.type = ButtonType.decelCruise
+        if self.CS.stock_cruise = True:
+          self.CS.cruise_dec = 5
       elif but == CruiseButtons.CANCEL:
         be.type = ButtonType.cancel
+        self.CS.cruise_inc = 0
+        self.CS.cruise_dec = 0
       elif but == CruiseButtons.MAIN:
         be.type = ButtonType.altButton3
       buttonEvents.append(be)
@@ -226,36 +232,24 @@ class CarInterface(CarInterfaceBase):
     if ret.vEgo < self.CP.minSteerSpeed:
       events.add(car.CarEvent.EventName.belowSteerSpeed)
 
-    # handle button presses
-    for b in ret.buttonEvents:
-      # do enable on both accel and decel buttons
-      if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
-        events.add(EventName.buttonEnable)
-      # do disable on button down
-      if b.type == ButtonType.cancel and b.pressed:
-        events.add(EventName.buttonCancel)
+    if ret.cruiseState.enabled and self.CS.main_on:
+      for b in ret.buttonEvents:       # handle button presses
+        if not self.CS.stock_cruise_prev and ret.vEgo > 12.0:
+          if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
+            self.CS.stock_cruise = True
+        elif self.CS.stock_cruise_prev:
+          if b.type == ButtonType.cancel and b.pressed:           # do disable on button down
+            self.CS.stock_cruise = False
+
+      if self.CS.regen_pressed:
+        self.CS.stock_cruise = False
+
+    elif not self.CS.main_on:
+      self.CS.stock_cruise = False
 
     ret.events = events.to_msg()
 
-    # copy back carState packet to CS
-    self.CS.out = ret.as_reader()
-
-    return self.CS.out
-
-    events = self.create_common_events(ret, pcm_enable=False)
-
-    if ret.vEgo < self.CP.minEnableSpeed:
-      events.add(EventName.belowEngageSpeed)
-    if self.CS.park_brake:
-      events.add(EventName.parkBrake)
-
-    # handle button presses
-    for b in ret.buttonEvents:
-      # do enable on both accel and decel buttons
-      if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
-        events.add(EventName.buttonEnable)
-
-    ret.events = events.to_msg()
+    self.CS.stock_cruise_prev = self.CS.stock_cruise
 
     # copy back carState packet to CS
     self.CS.out = ret.as_reader()
