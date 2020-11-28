@@ -283,7 +283,7 @@ class Controls:
     #  self.v_cruise_kph = update_v_cruise(self.v_cruise_kph, CS.buttonEvents, self.enabled)
     if not CS.stockCruise and CS.cruiseState.enabled:
       self.v_cruise_kph = 11.1111 * CV.MS_TO_KPH
-    elif self.CP.enableCruise:
+    elif CS.stockCruise:
       self.v_cruise_kph = CS.vEgo * CV.MS_TO_KPH
 
     # decrease the soft disable timer at every step, as it's reset on
