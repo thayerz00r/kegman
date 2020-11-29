@@ -20,14 +20,15 @@ class CarState(CarStateBase):
     self.distance_button = 0
     self.follow_level = 3
     self.engineRPM = 0
-    #self.stock_cruise = False
+    self.stock_cruise = False
     self.stock_cruise_prev = False
     self.cruise_inc = False
     self.cruise_dec = False
-    self.prev_cruise_buttons = 1
 
   def update(self, pt_cp):
     ret = car.CarState.new_message()
+
+    self.prev_cruise_buttons = self.cruise_buttons
     self.cruise_buttons = pt_cp.vl["ASCMSteeringButton"]['ACCButtons']
     self.prev_lka_button = self.lka_button
     self.lka_button = pt_cp.vl["ASCMSteeringButton"]["LKAButton"]
@@ -96,24 +97,7 @@ class CarState(CarStateBase):
     ret.steeringTorqueEps = pt_cp.vl["PSCMStatus"]['LKATorqueDelivered']
     self.engineRPM = pt_cp.vl["ECMEngineStatus"]['EngineRPM']
 
-    self.cruise_inc = False
-    self.cruise_dec = False
-    #Cruise lka_button, 1 - Init, 2 - Accel/Resume, 3 - Decel/Set, 5 - Main, 6 - Off
-    if ret.cruiseState.enabled and ret.vEgo > 12.0:
-      if self.cruise_buttons != self.prev_cruise_buttons:
-        if self.stock_cruise_prev:
-          if self.cruise_buttons == 2:
-            self.cruise_inc = True
-          elif self.cruise_buttons == 3:
-            self.cruise_dec = True
-          elif self.cruise_buttons == 5 or self.cruise_buttons == 6:
-            ret.stockCruise = False
-        else:
-          if self.cruise_buttons == 3:
-            self.stock_cruise_prev = True
-
-    self.prev_cruise_buttons = self.cruise_buttons
-    ret.stockCruise = self.stock_cruise_prev
+    ret.stockCruise = self.stock_cruise
 
     return ret
 
