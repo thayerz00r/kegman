@@ -99,7 +99,7 @@ class CarState(CarStateBase):
     self.cruise_inc = False
     self.cruise_dec = False
     #Cruise lka_button, 1 - Init, 2 - Accel/Resume, 3 - Decel/Set, 5 - Main, 6 - Off
-    if ret.cruiseState.enabled and ret.vEgo > 12.0:
+    if ret.cruiseState.available and ret.vEgo > 12.0:
       if self.cruise_buttons != self.prev_cruise_buttons:
         if self.stock_cruise_prev:
           if self.cruise_buttons == 2:
@@ -116,11 +116,6 @@ class CarState(CarStateBase):
     ret.stockCruise = self.stock_cruise_prev
 
     return ret
-
-
-  def get_follow_level(self):
-    return self.follow_level
-
 
   @staticmethod
   def get_can_parser(CP):
