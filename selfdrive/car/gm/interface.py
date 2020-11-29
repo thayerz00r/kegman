@@ -182,12 +182,17 @@ class CarInterface(CarInterfaceBase):
 
     ret.cruiseState.enabled = self.CS.main_on
 
-    #ret.readdistancelines = self.CS.follow_level
+    ret.readdistancelines = self.CS.follow_level
 
     ret.canValid = self.cp.can_valid
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
     ret.engineRPM = self.CS.engineRPM
+
+    if self.CS.distance_button and self.CS.distance_button != self.CS.prev_distance_button:
+       self.CS.follow_level -= 1
+       if self.CS.follow_level < 1:
+         self.CS.follow_level = 3
 
     events = self.create_common_events(ret)
 
@@ -199,6 +204,8 @@ class CarInterface(CarInterfaceBase):
       events.add(car.CarEvent.EventName.belowSteerSpeed)
 
     ret.events = events.to_msg()
+
+    self.CS.stock_cruise_prev = self.CS.stock_cruise
 
     # copy back carState packet to CS
     self.CS.out = ret.as_reader()
