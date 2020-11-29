@@ -189,34 +189,6 @@ class CarInterface(CarInterfaceBase):
 
     ret.engineRPM = self.CS.engineRPM
 
-    buttonEvents = []
-
-    if self.CS.cruise_buttons != self.CS.prev_cruise_buttons and self.CS.prev_cruise_buttons != CruiseButtons.INIT:
-      be = car.CarState.ButtonEvent.new_message()
-      be.type = ButtonType.unknown
-      if self.CS.cruise_buttons != CruiseButtons.UNPRESS:
-        be.pressed = True
-        but = self.CS.cruise_buttons
-      else:
-        be.pressed = False
-        but = self.CS.prev_cruise_buttons
-      if but == CruiseButtons.RES_ACCEL:
-        be.type = ButtonType.accelCruise  # Suppress resume button if we're resuming from stop so we don't adjust speed.
-        if ret.cruiseState.enabled and not CS.stock_cruise_prev:
-          self.CS.stock_cruise = True
-      elif but == CruiseButtons.DECEL_SET:
-        be.type = ButtonType.decelCruise
-        if ret.cruiseState.enabled and not CS.stock_cruise_prev:
-          self.CS.stock_cruise = True
-      elif but == CruiseButtons.CANCEL:
-        be.type = ButtonType.cancel
-        self.CS.stock_cruise = False
-      elif but == CruiseButtons.MAIN:
-        be.type = ButtonType.altButton3
-      buttonEvents.append(be)
-
-    ret.buttonEvents = buttonEvents
-
     if self.CS.distance_button and self.CS.distance_button != self.CS.prev_distance_button:
        self.CS.follow_level -= 1
        if self.CS.follow_level < 1:
@@ -230,21 +202,6 @@ class CarInterface(CarInterfaceBase):
       events.add(EventName.parkBrake)
     if ret.vEgo < self.CP.minSteerSpeed:
       events.add(car.CarEvent.EventName.belowSteerSpeed)
-
-    self.CS.cruise_inc = False
-    self.CS.cruise_dec = False
-    for b in ret.buttonEvents:       # handle button presses
-      if self.CS.stock_cruise_prev and ret.vEgo > 12.0:
-        if b.type == ButtonType.accelCruise and b.pressed:
-          self.CS.cruise_inc = True
-        elif b.type == ButtonType.decelCruise and b.pressed:
-          self.CS.cruise_dec = True
-
-    if self.CS.stock_cruise_prev and self.CS.regen_pressed:
-      self.CS.stock_cruise = False
-
-    if not self.CS.main_on:
-      self.CS.stock_cruise = False
 
     ret.events = events.to_msg()
 

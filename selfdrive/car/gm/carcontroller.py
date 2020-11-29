@@ -84,14 +84,14 @@ class CarController():
 
       if not enabled or not CS.out.stockCruise:
           self.cruise_sw_cnt = 0
-      elif enabled and CS.out.stockCruise:
+      elif enabled and CS.stock_cruise_prev:
         if self.cruise_sw_cnt < 0:
           acc_buttons = 2
-          can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_buttons))
+          #can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_buttons))
           self.cruise_sw_cnt += 1
         elif self.cruise_sw_cnt > 0:
           acc_buttons = 3
-          can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_buttons))
+          #can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_buttons))
           self.cruise_sw_cnt -= 1
 
     # GAS/BRAKE
