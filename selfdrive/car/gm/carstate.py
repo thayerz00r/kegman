@@ -22,8 +22,8 @@ class CarState(CarStateBase):
     self.engineRPM = 0
     self.stock_cruise = False
     self.stock_cruise_prev = False
-    self.cruise_inc = False
-    self.cruise_dec = False
+    #self.cruise_inc = False
+    #self.cruise_dec = False
 
   def update(self, pt_cp):
     ret = car.CarState.new_message()

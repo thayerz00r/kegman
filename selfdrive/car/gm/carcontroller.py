@@ -75,24 +75,10 @@ class CarController():
       can_sends.append(gmcan.create_steering_control(self.packer_pt, CanBus.POWERTRAIN, apply_steer, idx, lkas_enabled))
 
     #Cruise SW
-    if (frame % 20) == 0:
-
-      if CS.cruise_inc:
-        self.cruise_sw_cnt = -5
-      elif CS.cruise_dec:
-        self.cruise_sw_cnt = 5
-
-      if not enabled or not CS.out.stockCruise:
-          self.cruise_sw_cnt = 0
-      elif enabled and CS.out.stockCruise:
-        if self.cruise_sw_cnt < 0:
-          acc_buttons = 2
+    if (frame % 1000) == 0:
+      if enabled and CS.stock_cruise_prev:
+          acc_buttons = 6
           can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_buttons))
-          self.cruise_sw_cnt += 1
-        elif self.cruise_sw_cnt > 0:
-          acc_buttons = 3
-          can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_buttons))
-          self.cruise_sw_cnt -= 1
 
     # GAS/BRAKE
     # no output if not enabled, but keep sending keepalive messages
