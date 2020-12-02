@@ -77,8 +77,10 @@ class CarController():
     #Cruise SW
     if (frame % 1000) == 0:
       if enabled and CS.stock_cruise_prev:
-          acc_buttons = 6
-          can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_buttons))
+          acc_accel = False
+          acc_decel = False
+          acc_cancel = True
+          can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_accel, acc_decel, acc_cancel))
 
     # GAS/BRAKE
     # no output if not enabled, but keep sending keepalive messages

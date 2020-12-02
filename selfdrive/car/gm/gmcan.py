@@ -80,7 +80,15 @@ def create_acc_dashboard_command(packer, bus, acc_engaged, target_speed_kph, lea
 
   return packer.make_can_msg("ASCMActiveCruiseControlStatus", bus, values)
 
-def create_cruise_sw_command(packer, bus, acc_buttons):
+def create_cruise_sw_command(packer, bus, acc_accel, acc_decel, acc_cancel):
+  acc_buttons = 0x1
+
+  if acc_accel:
+    acc_buttons = 0x2
+  elif acc_decel:
+    acc_buttons = 0x3
+  elif acc_cancel:
+    acc_buttons = 0x6
 
   values = {
     "DistanceButton" : 0,
