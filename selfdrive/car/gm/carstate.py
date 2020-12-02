@@ -22,7 +22,6 @@ class CarState(CarStateBase):
     #self.engineRPM = 0
     self.HVBvoltage = 0
     self.HVBcurrent = 0
-    self.HVBpower = 0
     self.stock_cruise = False
     self.stock_cruise_prev = False
 
@@ -98,10 +97,10 @@ class CarState(CarStateBase):
     ret.steeringTorqueEps = pt_cp.vl["PSCMStatus"]['LKATorqueDelivered']
     #self.engineRPM = pt_cp.vl["ECMEngineStatus"]['EngineRPM']
 
-    if self.car_fingerprint == CAR.VOLT or self.car_fingerprint == CAR.BOLT:
+    if self.car_fingerprint == CAR.BOLT:
       self.HVBvoltage = pt_cp.vl["BECMBatteryVoltageCurrent"]['HVBatteryVoltage']
       self.HVBcurrent = pt_cp.vl["BECMBatteryVoltageCurrent"]['HVBatteryCurrent']
-      self.HVBpower = self.HVBvoltage * self.HVBcurrent / 1000   #kW
+      ret.HVBpower = self.HVBvoltage * self.HVBcurrent / 1000   #kW
 
     ret.stockCruise = self.stock_cruise
 
