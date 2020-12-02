@@ -242,7 +242,7 @@ void update_sockets(UIState *s) {
   if (sm.updated("carState")) {
     auto data = sm["carState"].getCarState();
     s->scene.brakeLights = data.getBrakeLights();
-    s->scene.hvBpower = data.gethvBpower();
+    s->scene.hvBpower = data.getHvBpower();
     s->scene.aEgo = data.getAEgo();
     s->scene.steeringTorqueEps = data.getSteeringTorqueEps();
   }
