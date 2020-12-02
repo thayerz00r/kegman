@@ -100,7 +100,7 @@ class CarState(CarStateBase):
     if self.car_fingerprint == CAR.BOLT:
       self.HVBvoltage = pt_cp.vl["BECMBatteryVoltageCurrent"]['HVBatteryVoltage']
       self.HVBcurrent = pt_cp.vl["BECMBatteryVoltageCurrent"]['HVBatteryCurrent']
-      ret.HVBpower = self.HVBvoltage * self.HVBcurrent / 1000   #kW
+      ret.hvBpower = self.HVBvoltage * self.HVBcurrent / 1000   #kW
 
     ret.stockCruise = self.stock_cruise
 
