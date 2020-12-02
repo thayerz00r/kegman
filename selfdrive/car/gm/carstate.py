@@ -19,7 +19,10 @@ class CarState(CarStateBase):
     self.lka_button = 0
     self.distance_button = 0
     self.follow_level = 3
-    self.engineRPM = 0
+    #self.engineRPM = 0
+    self.HVBvoltage = 0
+    self.HVBcurrent = 0
+    self.HVBpower = 0
 
   def update(self, pt_cp):
     ret = car.CarState.new_message()
@@ -91,7 +94,12 @@ class CarState(CarStateBase):
     ret.steerWarning = self.lkas_status not in [0, 1]
 
     ret.steeringTorqueEps = pt_cp.vl["PSCMStatus"]['LKATorqueDelivered']
-    self.engineRPM = pt_cp.vl["ECMEngineStatus"]['EngineRPM']
+    #self.engineRPM = pt_cp.vl["ECMEngineStatus"]['EngineRPM']
+
+    if self.car_fingerprint == CAR.VOLT or self.car_fingerprint == CAR.BOLT:
+      self.HVBvoltage = pt_cp.vl["BECMBatteryVoltageCurrent"]['HVBatteryVoltage']
+      self.HVBcurrent = pt_cp.vl["BECMBatteryVoltageCurrent"]['HVBatteryCurrent']
+      self.HVBpower = self.HVBvoltage * self.HVBcurrent / 1000   #kW
 
     return ret
 
@@ -132,12 +140,13 @@ class CarState(CarStateBase):
       ("LKATorqueDelivered", "PSCMStatus", 0),
       ("ACCCmdActive", "ASCMActiveCruiseControlStatus", 0),
       ("LKATotalTorqueDelivered", "PSCMStatus", 0),
-      ("EngineRPM", "ECMEngineStatus", 0),
     ]
 
     if CP.carFingerprint == CAR.VOLT or CP.carFingerprint == CAR.BOLT:
       signals += [
         ("RegenPaddle", "EBCMRegenPaddle", 0),
+        ("HVBatteryVoltage", "BECMBatteryVoltageCurrent", 0),
+        ("HVBatteryCurrent", "BECMBatteryVoltageCurrent", 0),
       ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, [], CanBus.POWERTRAIN)
