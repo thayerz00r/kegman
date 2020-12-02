@@ -116,7 +116,7 @@ typedef struct UIScene {
   bool recording;
   float gpsAccuracyUblox;
   float altitudeUblox;
-  int engineRPM;
+  float HVBpower;
   bool steerOverride;
   float output_scale;
   float steeringTorqueEps;

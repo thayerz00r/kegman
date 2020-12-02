@@ -242,10 +242,10 @@ void update_sockets(UIState *s) {
   if (sm.updated("carState")) {
     auto data = sm["carState"].getCarState();
     s->scene.brakeLights = data.getBrakeLights();
-    s->scene.engineRPM = data.getEngineRPM();
+    s->scene.HVBpower = data.getHVBpower();
     s->scene.aEgo = data.getAEgo();
     s->scene.steeringTorqueEps = data.getSteeringTorqueEps();
-  } 
+  }
 
   if (sm.updated("sensorEvents")) {
     for (auto sensor : sm["sensorEvents"].getSensorEvents()) {
@@ -316,7 +316,7 @@ void ui_update(UIState *s) {
       s->scene.athenaStatus = NET_CONNECTED;
     } else {
       s->scene.athenaStatus = NET_ERROR;
-  
+
 
     }
   }
