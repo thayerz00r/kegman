@@ -80,7 +80,7 @@ def create_acc_dashboard_command(packer, bus, acc_engaged, target_speed_kph, lea
 
   return packer.make_can_msg("ASCMActiveCruiseControlStatus", bus, values)
 
-def create_cruise_sw_command(packer, bus, acc_accel, acc_decel, acc_cancel, idx):
+def create_cruise_sw_command(packer, bus, acc_accel, acc_decel, acc_cancel):
   acc_buttons = 0x1
 
   if acc_accel:
@@ -90,12 +90,11 @@ def create_cruise_sw_command(packer, bus, acc_accel, acc_decel, acc_cancel, idx)
   elif acc_cancel:
     acc_buttons = 0x6
 
-  checksum = (idx << 6) + (0xf - acc_buttons - 1)
-  
   values = {
-    "RollingCounter": idx,
+    "DistanceButton" : 0,
+    "LKAButton" : 0,
     "ACCButtons" : acc_buttons,
-    "ACCButtonsChecksum" : checksum
+    "DriveModeButton" : 0
   }
 
   return packer.make_can_msg("ASCMSteeringButton", bus, values)
