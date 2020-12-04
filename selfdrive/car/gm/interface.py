@@ -242,7 +242,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.events = events.to_msg()
 
-    ret.stockCruise = self.stock_cruise
+    ret.stockCruise = self.CS.stock_cruise
 
     # copy back carState packet to CS
     self.CS.out = ret.as_reader()
