@@ -94,7 +94,7 @@ def create_cruise_sw_command(packer, bus, buttons, idx):
   elif buttons == 6:
     acc_buttons = 0x6
 
-  checksum = (idx << 6) + (0xf - acc_buttons - 1)
+  checksum = (idx << 6) + (0xf - idx - acc_buttons) + 1
 
   values = {
     "RollingCounter" : idx,

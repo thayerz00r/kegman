@@ -213,10 +213,10 @@ class CarInterface(CarInterfaceBase):
 
     ret.buttonEvents = buttonEvents
 
-    if self.CS.distance_button and self.CS.distance_button != self.CS.prev_distance_button:
-       self.CS.follow_level -= 1
-       if self.CS.follow_level < 1:
-         self.CS.follow_level = 3
+    #if self.CS.distance_button and self.CS.distance_button != self.CS.prev_distance_button:
+     #  self.CS.follow_level -= 1
+      # if self.CS.follow_level < 1:
+        # self.CS.follow_level = 3
 
     events = self.create_common_events(ret)
 
@@ -232,20 +232,17 @@ class CarInterface(CarInterfaceBase):
         #if b.type == ButtonType.accelCruise and not b.pressed:
          # self.CS.stock_cruise = True
         if b.type == ButtonType.decelCruise and not b.pressed:
-          if not self.CS.stock_cruise_prev and (ret.vEgo > 45 * CV.KPH_TO_MS):
+          if not self.CS.stock_cruise and (ret.vEgo > 45 * CV.KPH_TO_MS):
             self.CS.stock_cruise = True
         elif b.type == ButtonType.cancel and b.pressed:
           self.CS.stock_cruise = False
 
-    if self.CS.stock_cruise_prev and self.CS.regen_pressed:
-      self.CS.stock_cruise = False
-
-    if not self.CS.main_on:
+    if not self.CS.main_on or self.CS.regen_pressed or ret.brakePressed:
       self.CS.stock_cruise = False
 
     ret.events = events.to_msg()
 
-    self.CS.stock_cruise_prev = self.CS.stock_cruise
+    ret.stockCruise = self.stock_cruise
 
     # copy back carState packet to CS
     self.CS.out = ret.as_reader()
