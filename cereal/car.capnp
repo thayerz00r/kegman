@@ -194,7 +194,7 @@ struct CarState {
   rightBlindspot @34 :Bool; # Is there something blocking the right lane change
 
   # HV Battery Power
-  hvBpower @43 :Float32;
+  hvBpower @42 :Float32;
 
   struct WheelSpeeds {
     # optional wheel speeds
