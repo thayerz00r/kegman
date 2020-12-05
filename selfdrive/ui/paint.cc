@@ -748,16 +748,16 @@ static void bb_ui_draw_measures_right(UIState *s, int bb_x, int bb_y, int bb_w )
     char val_str[16];
     char uom_str[4];
     NVGcolor val_color = nvgRGBA(255, 255, 255, 200);
-    if(((int)s->scene.hvBpower) < -40) {
+    if((int)(s->scene.hvBpower) < -40) {
       val_color = nvgRGBA(255, 0, 0, 200);
     }
-    if(((int)s->scene.hvBpower) < -20) {
+    if((int)(s->scene.hvBpower) < -20) {
       val_color = nvgRGBA(255, 188, 3, 200);
     }
-    if(((int)s->scene.hvBpower) > 40) {
+    if((int)(s->scene.hvBpower) > 40) {
       val_color = nvgRGBA(0, 255, 0, 200);
     }
-    if(((int)s->scene.hvBpower) > 20) {
+    if((int)(s->scene.hvBpower) > 20) {
       val_color = nvgRGBA(0, 255, 255, 200);
     }
     snprintf(val_str, sizeof(val_str), "%.0f", (s->scene.hvBpower));
