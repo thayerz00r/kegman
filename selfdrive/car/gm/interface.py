@@ -213,10 +213,10 @@ class CarInterface(CarInterfaceBase):
 
     ret.buttonEvents = buttonEvents
 
-    #if self.CS.distance_button and self.CS.distance_button != self.CS.prev_distance_button:
-     #  self.CS.follow_level -= 1
-      # if self.CS.follow_level < 1:
-        # self.CS.follow_level = 3
+    if self.CS.distance_button and self.CS.distance_button != self.CS.prev_distance_button:
+      self.CS.follow_level -= 1
+      if self.CS.follow_level < 1:
+        self.CS.follow_level = 3
 
     events = self.create_common_events(ret)
 

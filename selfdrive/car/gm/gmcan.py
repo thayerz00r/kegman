@@ -99,7 +99,10 @@ def create_cruise_sw_command(packer, bus, buttons, idx):
   values = {
     "RollingCounter" : idx,
     "ACCButtons" : acc_buttons,
-    "ACCButtonsChecksum" : checksum
+    "ACCButtonsChecksum" : checksum,
+    "DistanceButton" : 0,
+    "LKAButton" : 0,
+    "DriveModeButton" : 0,
   }
 
   return packer.make_can_msg("ASCMSteeringButton", bus, values)

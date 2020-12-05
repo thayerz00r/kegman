@@ -14,11 +14,11 @@ class CarState(CarStateBase):
     can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
     self.shifter_values = can_define.dv["ECMPRDNL"]["PRNDL"]
 
-    #self.prev_distance_button = 0
-    #self.prev_lka_button = 0
-    #self.lka_button = 0
-    #self.distance_button = 0
-    #self.follow_level = 3
+    self.prev_distance_button = 0
+    self.prev_lka_button = 0
+    self.lka_button = 0
+    self.distance_button = 0
+    self.follow_level = 3
     #self.engineRPM = 0
     self.HVBvoltage = 0
     self.HVBcurrent = 0
@@ -30,10 +30,10 @@ class CarState(CarStateBase):
 
     self.prev_cruise_buttons = self.cruise_buttons
     self.cruise_buttons = pt_cp.vl["ASCMSteeringButton"]['ACCButtons']
-    #self.prev_lka_button = self.lka_button
-    #self.lka_button = pt_cp.vl["ASCMSteeringButton"]["LKAButton"]
-    #self.prev_distance_button = self.distance_button
-    #self.distance_button = pt_cp.vl["ASCMSteeringButton"]["DistanceButton"]
+    self.prev_lka_button = self.lka_button
+    self.lka_button = pt_cp.vl["ASCMSteeringButton"]["LKAButton"]
+    self.prev_distance_button = self.distance_button
+    self.distance_button = pt_cp.vl["ASCMSteeringButton"]["DistanceButton"]
 
     ret.wheelSpeeds.fl = pt_cp.vl["EBCMWheelSpdFront"]['FLWheelSpd'] * CV.KPH_TO_MS
     ret.wheelSpeeds.fr = pt_cp.vl["EBCMWheelSpdFront"]['FRWheelSpd'] * CV.KPH_TO_MS
@@ -105,8 +105,8 @@ class CarState(CarStateBase):
     return ret
 
 
-  #def get_follow_level(self):
-    #return self.follow_level
+  def get_follow_level(self):
+    return self.follow_level
 
 
   @staticmethod
@@ -136,8 +136,8 @@ class CarState(CarStateBase):
       ("TractionControlOn", "ESPStatus", 0),
       ("EPBClosed", "EPBStatus", 0),
       ("CruiseMainOn", "ECMEngineStatus", 0),
-      #("LKAButton", "ASCMSteeringButton", 0),
-      #("DistanceButton", "ASCMSteeringButton", 0),
+      ("LKAButton", "ASCMSteeringButton", 0),
+      ("DistanceButton", "ASCMSteeringButton", 0),
       ("LKATorqueDelivered", "PSCMStatus", 0),
       ("ACCCmdActive", "ASCMActiveCruiseControlStatus", 0),
       ("LKATotalTorqueDelivered", "PSCMStatus", 0),
