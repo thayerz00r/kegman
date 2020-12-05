@@ -748,10 +748,18 @@ static void bb_ui_draw_measures_right(UIState *s, int bb_x, int bb_y, int bb_w )
     char val_str[16];
     char uom_str[4];
     NVGcolor val_color = nvgRGBA(255, 255, 255, 200);
-    //if(s->scene.engineRPM == 0) {
-    //  snprintf(val_str, sizeof(val_str), "OFF");
-    //}
-    //else {snprintf(val_str, sizeof(val_str), "%d", (s->scene.engineRPM));}
+    if(s->scene.hvBpower < -40) {
+      val_color = nvgRGBA(255, 0, 0, 200);
+    }
+    if(s->scene.hvBpower < -20) {
+      val_color = nvgRGBA(255, 188, 3, 200);
+    }
+    if(s->scene.hvBpower > 40) {
+      val_color = nvgRGBA(0, 255, 0, 200);
+    }
+    if(s->scene.hvBpower > 20) {
+      val_color = nvgRGBA(0, 255, 255, 200);
+    }
     snprintf(val_str, sizeof(val_str), "%.0f", (s->scene.hvBpower));
     snprintf(uom_str, sizeof(uom_str), "kW");
     bb_h +=bb_ui_draw_measure(s,  val_str, uom_str, "BAT PWR",
