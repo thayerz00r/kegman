@@ -245,6 +245,11 @@ void update_sockets(UIState *s) {
     s->scene.hvBpower = data.getHvBpower();
     s->scene.aEgo = data.getAEgo();
     s->scene.steeringTorqueEps = data.getSteeringTorqueEps();
+    if(scene.leftBlinker!=data.getLeftBlinker() || scene.rightBlinker!=data.getRightBlinker()) {
+      scene.blinker_blinkingrate = 100;
+    }
+    scene.leftBlinker = data.getLeftBlinker();
+    scene.rightBlinker = data.getRightBlinker();
   }
 
   if (sm.updated("sensorEvents")) {

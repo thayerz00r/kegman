@@ -124,6 +124,10 @@ typedef struct UIScene {
   float cpuTemp;
   int cpuPerc;
 
+  bool leftBlinker;
+  bool rightBlinker;
+  int blinker_blinkingrate;
+
   cereal::HealthData::HwType hwType;
   int satelliteCount;
   NetStatus athenaStatus;
