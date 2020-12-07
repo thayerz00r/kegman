@@ -368,6 +368,30 @@ static void ui_draw_vision_speed(UIState *s) {
   const int viz_speed_x = viz_rect.centerX() - viz_speed_w/2;
   char speed_str[32];
 
+  //Blinker
+  if(s->scene.leftBlinker) {
+    nvgBeginPath(s->vg);
+    nvgMoveTo(s->vg, viz_speed_x, box_y + header_h/4);
+    nvgLineTo(s->vg, viz_speed_x - viz_speed_w/2, box_y + header_h/4 + header_h/4);
+    nvgLineTo(s->vg, viz_speed_x, box_y + header_h/2 + header_h/4);
+    nvgClosePath(s->vg);
+    nvgFillColor(s->vg, nvgRGBA(23,134,68,s->scene.blinker_blinkingrate>=50?210:60));
+    nvgFill(s->vg);
+  }
+  if(s->scene.rightBlinker) {
+    nvgBeginPath(s->vg);
+    nvgMoveTo(s->vg, viz_speed_x+viz_speed_w, box_y + header_h/4);
+    nvgLineTo(s->vg, viz_speed_x+viz_speed_w + viz_speed_w/2, box_y + header_h/4 + header_h/4);
+    nvgLineTo(s->vg, viz_speed_x+viz_speed_w, box_y + header_h/2 + header_h/4);
+    nvgClosePath(s->vg);
+    nvgFillColor(s->vg, nvgRGBA(23,134,68,s->scene.blinker_blinkingrate>=50?210:60));
+    nvgFill(s->vg);
+  }
+  if(s->scene.leftBlinker || s->scene.rightBlinker) {
+    s->scene.blinker_blinkingrate -= 3;
+    if(s->scene.blinker_blinkingrate<0) s->scene.blinker_blinkingrate = 120;
+  }
+
   nvgBeginPath(s->vg);
   nvgRect(s->vg, viz_speed_x, viz_rect.y, viz_speed_w, header_h);
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
@@ -748,10 +772,18 @@ static void bb_ui_draw_measures_right(UIState *s, int bb_x, int bb_y, int bb_w )
     char val_str[16];
     char uom_str[4];
     NVGcolor val_color = nvgRGBA(255, 255, 255, 200);
-    //if(s->scene.engineRPM == 0) {
-    //  snprintf(val_str, sizeof(val_str), "OFF");
-    //}
-    //else {snprintf(val_str, sizeof(val_str), "%d", (s->scene.engineRPM));}
+    if((int)(s->scene.hvBpower) < -20) {
+      val_color = nvgRGBA(255, 188, 3, 200);
+    }
+    if((int)(s->scene.hvBpower) < -40) {
+      val_color = nvgRGBA(255, 0, 0, 200);
+    }
+    if((int)(s->scene.hvBpower) > 20) {
+      val_color = nvgRGBA(0, 255, 255, 200);
+    }
+    if((int)(s->scene.hvBpower) > 40) {
+      val_color = nvgRGBA(0, 255, 0, 200);
+    }
     snprintf(val_str, sizeof(val_str), "%.0f", (s->scene.hvBpower));
     snprintf(uom_str, sizeof(uom_str), "kW");
     bb_h +=bb_ui_draw_measure(s,  val_str, uom_str, "BAT PWR",
