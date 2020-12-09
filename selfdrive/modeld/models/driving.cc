@@ -373,8 +373,8 @@ void model_publish_v2(PubMaster &pm, uint32_t vipc_frame_id, uint32_t frame_id,
   auto leads = framed.initLeads(LEAD_MHP_SELECTION);
   float t_offsets[LEAD_MHP_SELECTION] = {0.0, 2.0, 4.0};
   for (int t_offset=0; t_offset<LEAD_MHP_SELECTION; t_offset++) {
+    int mdn_max_idx = 0;
     for (int i=1; i<LEAD_MHP_N; i++) {
-      int mdn_max_idx = 0;
       if (net_outputs.lead[(i+1)*(LEAD_MHP_GROUP_SIZE) + t_offset - LEAD_MHP_SELECTION] >
           net_outputs.lead[(mdn_max_idx + 1)*(LEAD_MHP_GROUP_SIZE) + t_offset - LEAD_MHP_SELECTION]) {
         mdn_max_idx = i;
