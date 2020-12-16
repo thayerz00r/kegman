@@ -27,7 +27,7 @@ const int GM_MAX_BRAKE = 350;
 const CanMsg GM_TX_MSGS[] = {{384, 0, 4}, {1033, 0, 7}, {1034, 0, 7}, {715, 0, 8}, {880, 0, 6}, {481, 0, 7}, // pt bus
                              {161, 1, 7}, {774, 1, 8}, {776, 1, 7}, {784, 1, 2},   // obs bus
                              {789, 2, 5},  // ch bus
-                             {0x104c006c, 3, 3}, {0x10400060, 3, 5}};  // gmlan
+                             {0x104c006c, 3, 3}, {0x10400060, 3, 5}, {0x10758000, 3, 3}, {0x80758000, 3, 3}};  // gmlan
 
 // TODO: do checksum and counter checks. Add correct timestep, 0.1s for now.
 AddrCheckStruct gm_rx_checks[] = {

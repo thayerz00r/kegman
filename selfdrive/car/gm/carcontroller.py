@@ -60,7 +60,7 @@ class CarController():
 
     # STEER
     lkas_enabled = enabled and not CS.out.steerWarning and CS.out.vEgo > P.MIN_STEER_SPEED
-    if (frame % P.STEER_STEP) == 0:      
+    if (frame % P.STEER_STEP) == 0:
       if lkas_enabled:
         new_steer = actuators.steer * P.STEER_MAX
         apply_steer = apply_std_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, P)
@@ -79,10 +79,10 @@ class CarController():
     #    idx = (frame // 3) % 4
     #    acc_buttons = 6
     #    can_send.append(gmcan.create_cruise_sw_command(self.packer_pt, CanBus.POWERTRAIN, acc_buttons, idx))
-    #if (frame % 100) == 0:
-    #  if enabled:
-    #    acc_buttons = 6
-    #    can_sends.append(gmcan.create_cruise_sw_command(CanBus.SW_GMLAN, acc_buttons))
+    if (frame % 100) == 0:
+      if enabled:
+        acc_buttons = 6
+        can_sends.append(gmcan.create_cruise_sw_command(CanBus.SW_GMLAN, acc_buttons))
 
     # GAS/BRAKE
     # no output if not enabled, but keep sending keepalive messages
