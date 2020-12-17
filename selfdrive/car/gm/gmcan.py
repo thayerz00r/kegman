@@ -113,24 +113,24 @@ def create_cruise_sw_command(bus, acc_buttons):
 
   if acc_buttons == 1:
     #dat = 0b001
-    dat = b"\x02\x00\x00"
+    dat = b"\x00\x00\x00"
   elif acc_buttons == 2:
     #dat = 0b010
-    dat = b"\x04\x00\x00"
+    dat = b"\x00\x10\x00"
   elif acc_buttons == 3:
     #dat = 0b011
-    dat = b"\x06\x00\x00"
+    dat = b"\x00\x20\x00"
   elif acc_buttons == 5:
     #dat = 0b101
-    dat = b"\x0A\x00\x00"
+    dat = b"\x00\x40\x00"
   elif acc_buttons == 6:
     #dat = 0b110
-    dat = b"\x0C\x00\x00"
+    dat = b"\x00\x80\x00"
   else:
     #dat = 0b000
     dat = b"\x00\x00\x00"
 
-  return make_can_msg(0x10758000, dat, bus)
+  return make_can_msg(0x80758000, dat, bus)
 
 def create_adas_time_status(bus, tt, idx):
   dat = [(tt >> 20) & 0xff, (tt >> 12) & 0xff, (tt >> 4) & 0xff,
