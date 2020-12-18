@@ -113,19 +113,19 @@ def create_cruise_sw_command(bus, acc_buttons):
 
   if acc_buttons == 1:
     #dat = 0b001
-    dat = b"\x00\x00\x00"
+    dat = b"\x01\x00\x00"
   elif acc_buttons == 2:
     #dat = 0b010
-    dat = b"\x00\x10\x00"
+    dat = b"\x01\x10\x00"
   elif acc_buttons == 3:
     #dat = 0b011
-    dat = b"\x00\x20\x00"
+    dat = b"\x01\x20\x00"
   elif acc_buttons == 5:
     #dat = 0b101
-    dat = b"\x00\x40\x00"
+    dat = b"\x01\x40\x00"
   elif acc_buttons == 6:
     #dat = 0b110
-    dat = b"\x00\x80\x00"
+    dat = b"\x01\x80\x00"
   else:
     #dat = 0b000
     dat = b"\x00\x00\x00"
