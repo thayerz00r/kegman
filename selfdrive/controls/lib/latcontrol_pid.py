@@ -26,7 +26,7 @@ class LatControlPID():
 
   def reset(self):
     self.pid.reset()
-    
+
   def live_tune(self, CP):
     self.mpc_frame += 1
     if self.mpc_frame % 300 == 0:
@@ -40,13 +40,13 @@ class LatControlPID():
         #                    (CP.lateralTuning.pid.kiBP, self.steerKiV),
         #                    k_f=self.steerKf, pos_limit=1.0)
         self.deadzone = float(self.kegman.conf['deadzone'])
-        
-      self.mpc_frame = 0    
+
+      self.mpc_frame = 0
 
 
   def update(self, active, CS, CP, path_plan):
     self.live_tune(CP)
- 
+
     pid_log = log.ControlsState.LateralPIDState.new_message()
     pid_log.steerAngle = float(CS.steeringAngle)
     pid_log.steerRate = float(CS.steeringRate)
@@ -84,7 +84,7 @@ class LatControlPID():
       pid_log.f = self.pid.f
       pid_log.output = output_steer
       pid_log.saturated = bool(self.pid.saturated)
-	  
-	  self.angle_steers_des_last = self.angle_steers_des
+
+      self.angle_steers_des_last = self.angle_steers_des
 
     return output_steer, float(self.angle_steers_des), pid_log
