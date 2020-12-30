@@ -109,6 +109,8 @@ bool cruise_engaged_prev = false;
 float vehicle_speed = 0;
 bool vehicle_moving = false;
 bool message_pump_active = false;
+bool gm_relay_open = false;
+int gm_camera_bus = -1;
 
 // for safety modes with torque steering control
 int desired_torque_last = 0;       // last desired steer torque

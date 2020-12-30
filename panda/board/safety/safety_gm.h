@@ -80,14 +80,41 @@ static void gm_set_op_lkas(CAN_FIFOMailBox_TypeDef *to_send) {
   gm_lkas_buffer.op_ts = TIM2->CNT;
 }
 
+static void gm_detect_cam(void) {
+  if (gm_camera_bus != -1) return;
+  if (board_has_relay()) {
+    gm_camera_bus = 2;
+  }
+  else {
+    gm_camera_bus = 1;
+  }
+}
 
 static int gm_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
 
   bool valid = addr_safety_check(to_push, gm_rx_checks, GM_RX_CHECK_LEN,
                                  NULL, NULL, NULL);
 
-  if (valid && (GET_BUS(to_push) == 0)) {
+  if (valid) {
+    gm_detect_cam();
+    int bus = GET_BUS(to_push);
     int addr = GET_ADDR(to_push);
+
+    if (board_has_relay() && !gm_relay_open) {
+      if (addr == 384) {
+        int rolling_counter = GET_BYTE(to_push, 0) >> 4;
+        if (rolling_counter == 0) {
+          gm_lkas_buffer.rolling_counter = 3;
+        }
+        else {
+          gm_lkas_buffer.rolling_counter = rolling_counter - 1;
+        }
+        set_intercept_relay(true);
+        heartbeat_counter = 0U;
+        gm_relay_open = true;
+      }
+      return 0;
+    }
 
     if (addr == 388) {
       int torque_driver_new = ((GET_BYTE(to_push, 6) & 0x7) << 8) | GET_BYTE(to_push, 7);
@@ -154,9 +181,11 @@ static int gm_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
 //     block all commands that produce actuation
 
 static int gm_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
-
+  if (board_has_relay() && !gm_relay_open) return 0; //for now, when relay is closed we don't want to do anything
   int tx = 1;
   int addr = GET_ADDR(to_send);
+  int bus = GET_BUS(to_send);
+  gm_detect_cam();
 
   if (!msg_allowed(to_send, GM_TX_MSGS, sizeof(GM_TX_MSGS)/sizeof(GM_TX_MSGS[0]))) {
     tx = 0;
@@ -263,15 +292,16 @@ static int gm_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
 }
 
 static int gm_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
-
+  if (board_has_relay() && !gm_relay_open) return 0; //for now, when relay is closed we don't want to do anything
+  gm_detect_cam();
   int bus_fwd = -1;
   if (bus_num == 0) {
     if (gm_ffc_detected) {
       //only perform forwarding if we have seen LKAS messages on CAN2
-      bus_fwd = 1;  // Camera is on CAN2
+      bus_fwd = gm_camera_bus;  // Camera is on CAN2
     }
   }
-  if (bus_num == 1) {
+  if (bus_num == gm_camera_bus) {
     int addr = GET_ADDR(to_fwd);
     if (addr != 384) {
       //only perform forwarding if we have seen LKAS messages on CAN2
