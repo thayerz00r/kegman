@@ -137,18 +137,18 @@ while True:
   if float(kegman.conf['accelerationMode']) != 0 and float(kegman.conf['accelerationMode']) != 1 and float(kegman.conf['accelerationMode'] != "2"):
     kegman.conf['accelerationMode'] = "1"
 
-  if float(kegman.conf['Ki']) < 0 and float(kegman.conf['Ki']) != -1:
-    kegman.conf['Ki'] = "0"
+  #if float(kegman.conf['Ki']) < 0 and float(kegman.conf['Ki']) != -1:
+    #kegman.conf['Ki'] = "0"
 
-  if float(kegman.conf['Ki']) > 2:
-    kegman.conf['Ki'] = "2"
+  #if float(kegman.conf['Ki']) > 2:
+    #kegman.conf['Ki'] = "2"
 
-  if float(kegman.conf['Kp']) < 0 and float(kegman.conf['Kp']) != -1:
-    kegman.conf['Kp'] = "0"
+  #if float(kegman.conf['Kp']) < 0 and float(kegman.conf['Kp']) != -1:
+    #kegman.conf['Kp'] = "0"
 
-  if float(kegman.conf['Kp']) > 3:
-    kegman.conf['Kp'] = "3"
-    
+  #if float(kegman.conf['Kp']) > 3:
+    #kegman.conf['Kp'] = "3"
+
   #if kegman.conf['liveParams'] != "1" and kegman.conf['liveParams'] != "0":
   #  kegman.conf['liveParams'] = "1"
     

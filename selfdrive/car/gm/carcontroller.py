@@ -13,9 +13,9 @@ VisualAlert = car.CarControl.HUDControl.VisualAlert
 class CarControllerParams():
   def __init__(self):
     self.STEER_MAX = 300
-    self.STEER_STEP = 2              # how often we update the steer cmd
-    self.STEER_DELTA_UP = 7          # ~0.75s time to peak torque (255/50hz/0.75s)
-    self.STEER_DELTA_DOWN = 17       # ~0.3s from peak torque to zero
+    self.STEER_STEP = 4              # how often we update the steer cmd
+    self.STEER_DELTA_UP = 10          # ~0.75s time to peak torque (255/50hz/0.75s)
+    self.STEER_DELTA_DOWN = 20       # ~0.3s from peak torque to zero
     self.MIN_STEER_SPEED = 3.
     self.STEER_DRIVER_ALLOWANCE = 50   # allowed driver torque before start limiting
     self.STEER_DRIVER_MULTIPLIER = 4   # weight driver torque heavily
@@ -59,8 +59,8 @@ class CarController():
     can_sends = []
 
     # STEER
-    if (frame % P.STEER_STEP) == 0:
-      lkas_enabled = enabled and not CS.out.steerWarning and CS.lkMode and CS.out.vEgo > P.MIN_STEER_SPEED
+    lkas_enabled = enabled and not CS.out.steerWarning and CS.out.vEgo > P.MIN_STEER_SPEED
+    if (frame % P.STEER_STEP) == 0:      
       if lkas_enabled:
         new_steer = actuators.steer * P.STEER_MAX
         apply_steer = apply_std_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, P)
@@ -89,24 +89,13 @@ class CarController():
     # Gas/regen and brakes - all at 25Hz
     if (frame % 4) == 0:
       idx = (frame // 4) % 4
-      if CS.cruiseMain and not enabled and CS.autoHold and CS.autoHoldActive and not CS.out.gasPressed and CS.out.gearShifter == 'drive' and CS.out.vEgo < 0.01 and not CS.regenPaddlePressed:
-        # Auto Hold State
-        car_stopping = apply_gas < P.ZERO_GAS
-        standstill = CS.pcm_acc_status == AccState.STANDSTILL
-
-        at_full_stop = standstill and car_stopping
-        near_stop = (CS.out.vEgo < P.NEAR_STOP_BRAKE_PHASE) and car_stopping
-        can_sends.append(gmcan.create_friction_brake_command(self.packer_ch, CanBus.CHASSIS, apply_brake, idx, near_stop, at_full_stop))
-        CS.autoHoldActivated = True
-
-      else : 
-        car_stopping = apply_gas < P.ZERO_GAS
-        standstill = CS.pcm_acc_status == AccState.STANDSTILL
+      
+	   car_stopping = apply_gas < P.ZERO_GAS
+	   standstill = CS.pcm_acc_status == AccState.STANDSTILL
 
         at_full_stop = enabled and standstill and car_stopping
         near_stop = enabled and (CS.out.vEgo < P.NEAR_STOP_BRAKE_PHASE) and car_stopping
-        can_sends.append(gmcan.create_friction_brake_command(self.packer_ch, CanBus.CHASSIS, apply_brake, idx, near_stop, at_full_stop))
-        CS.autoHoldActivated = False
+        #can_sends.append(gmcan.create_friction_brake_command(self.packer_ch, CanBus.CHASSIS, apply_brake, idx, near_stop, at_full_stop))
 
         # Auto-resume from full stop by resetting ACC control
         acc_enabled = enabled
@@ -114,7 +103,7 @@ class CarController():
         if standstill and not car_stopping:
           acc_enabled = False
       
-        can_sends.append(gmcan.create_gas_regen_command(self.packer_pt, CanBus.POWERTRAIN, apply_gas, idx, acc_enabled, at_full_stop))
+        #can_sends.append(gmcan.create_gas_regen_command(self.packer_pt, CanBus.POWERTRAIN, apply_gas, idx, acc_enabled, at_full_stop))
 
    
 
@@ -132,14 +121,14 @@ class CarController():
 
     if frame % time_and_headlights_step == 0:
       idx = (frame // time_and_headlights_step) % 4
-      can_sends.append(gmcan.create_adas_time_status(CanBus.OBSTACLE, int((tt - self.start_time) * 60), idx))
-      can_sends.append(gmcan.create_adas_headlights_status(self.packer_obj, CanBus.OBSTACLE))
+      #can_sends.append(gmcan.create_adas_time_status(CanBus.OBSTACLE, int((tt - self.start_time) * 60), idx))
+      #can_sends.append(gmcan.create_adas_headlights_status(self.packer_obj, CanBus.OBSTACLE))
 
     speed_and_accelerometer_step = 2
     if frame % speed_and_accelerometer_step == 0:
       idx = (frame // speed_and_accelerometer_step) % 4
-      can_sends.append(gmcan.create_adas_steering_status(CanBus.OBSTACLE, idx))
-      can_sends.append(gmcan.create_adas_accelerometer_speed_status(CanBus.OBSTACLE, CS.out.vEgo, idx))
+      #can_sends.append(gmcan.create_adas_steering_status(CanBus.OBSTACLE, idx))
+      #can_sends.append(gmcan.create_adas_accelerometer_speed_status(CanBus.OBSTACLE, CS.out.vEgo, idx))
 
     if frame % P.ADAS_KEEPALIVE_STEP == 0:
       can_sends += gmcan.create_adas_keepalive(CanBus.POWERTRAIN)
