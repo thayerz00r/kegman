@@ -96,27 +96,27 @@ class CarController():
 
         at_full_stop = standstill and car_stopping
         near_stop = (CS.out.vEgo < P.NEAR_STOP_BRAKE_PHASE) and car_stopping
-        can_sends.append(gmcan.create_friction_brake_command(self.packer_ch, CanBus.CHASSIS, apply_brake, idx, near_stop, at_full_stop))
-        CS.autoHoldActivated = True
+        #can_sends.append(gmcan.create_friction_brake_command(self.packer_ch, CanBus.CHASSIS, apply_brake, idx, near_stop, at_full_stop))
+        #CS.autoHoldActivated = True
 
-      else : 
+      else :
         car_stopping = apply_gas < P.ZERO_GAS
         standstill = CS.pcm_acc_status == AccState.STANDSTILL
 
         at_full_stop = enabled and standstill and car_stopping
         near_stop = enabled and (CS.out.vEgo < P.NEAR_STOP_BRAKE_PHASE) and car_stopping
-        can_sends.append(gmcan.create_friction_brake_command(self.packer_ch, CanBus.CHASSIS, apply_brake, idx, near_stop, at_full_stop))
-        CS.autoHoldActivated = False
+        #can_sends.append(gmcan.create_friction_brake_command(self.packer_ch, CanBus.CHASSIS, apply_brake, idx, near_stop, at_full_stop))
+        #CS.autoHoldActivated = False
 
         # Auto-resume from full stop by resetting ACC control
         acc_enabled = enabled
-      
+
         if standstill and not car_stopping:
           acc_enabled = False
-      
-        can_sends.append(gmcan.create_gas_regen_command(self.packer_pt, CanBus.POWERTRAIN, apply_gas, idx, acc_enabled, at_full_stop))
 
-   
+        #can_sends.append(gmcan.create_gas_regen_command(self.packer_pt, CanBus.POWERTRAIN, apply_gas, idx, acc_enabled, at_full_stop))
+
+
 
     follow_level = CS.get_follow_level()
 
@@ -132,14 +132,14 @@ class CarController():
 
     if frame % time_and_headlights_step == 0:
       idx = (frame // time_and_headlights_step) % 4
-      can_sends.append(gmcan.create_adas_time_status(CanBus.OBSTACLE, int((tt - self.start_time) * 60), idx))
-      can_sends.append(gmcan.create_adas_headlights_status(self.packer_obj, CanBus.OBSTACLE))
+      #can_sends.append(gmcan.create_adas_time_status(CanBus.OBSTACLE, int((tt - self.start_time) * 60), idx))
+      #can_sends.append(gmcan.create_adas_headlights_status(self.packer_obj, CanBus.OBSTACLE))
 
     speed_and_accelerometer_step = 2
     if frame % speed_and_accelerometer_step == 0:
       idx = (frame // speed_and_accelerometer_step) % 4
-      can_sends.append(gmcan.create_adas_steering_status(CanBus.OBSTACLE, idx))
-      can_sends.append(gmcan.create_adas_accelerometer_speed_status(CanBus.OBSTACLE, CS.out.vEgo, idx))
+      #can_sends.append(gmcan.create_adas_steering_status(CanBus.OBSTACLE, idx))
+      #can_sends.append(gmcan.create_adas_accelerometer_speed_status(CanBus.OBSTACLE, CS.out.vEgo, idx))
 
     if frame % P.ADAS_KEEPALIVE_STEP == 0:
       can_sends += gmcan.create_adas_keepalive(CanBus.POWERTRAIN)

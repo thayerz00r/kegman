@@ -14,7 +14,7 @@ class CarState(CarStateBase):
     super().__init__(CP)
     can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
     self.shifter_values = can_define.dv["ECMPRDNL"]["PRNDL"]
-      
+
     self.prev_distance_button = 0
     self.prev_lka_button = 0
     self.lka_button = 0
@@ -71,24 +71,28 @@ class CarState(CarStateBase):
     ret.rightBlinker = pt_cp.vl["BCMTurnSignals"]['TurnSignals'] == 2
 
     self.park_brake = pt_cp.vl["EPBStatus"]['EPBClosed']
-    ret.cruiseState.available = bool(pt_cp.vl["ECMEngineStatus"]['CruiseMainOn'])
-    self.cruiseMain = ret.cruiseState.available
+    self.main_on = bool(pt_cp.vl["ECMEngineStatus"]['CruiseMainOn'])
     ret.espDisabled = pt_cp.vl["ESPStatus"]['TractionControlOn'] != 1
-    self.pcm_acc_status = pt_cp.vl["AcceleratorPedal2"]['CruiseState']
+    self.pcm_acc_status = pt_cp.vl["ASCMActiveCruiseControlStatus"]['ACCCmdActive']
+    ret.cruiseState.available = self.main_on
+    ret.cruiseState.enabled = self.pcm_acc_status != 0
+    ret.cruiseState.standstill = False
 
     ret.brakePressed = ret.brake > 1e-5
     # Regen braking is braking
-    if self.car_fingerprint == CAR.VOLT:
-      self.regenPaddlePressed = bool(pt_cp.vl["EBCMRegenPaddle"]['RegenPaddle'])
-      ret.brakePressed = ret.brakePressed or self.regenPaddlePressed
-      
-    ret.cruiseState.enabled = self.pcm_acc_status != AccState.OFF
-    ret.cruiseState.standstill = False
+    self.regen_pressed = False
+    if self.car_fingerprint == CAR.VOLT or self.car_fingerprint == CAR.BOLT:
+      self.regen_pressed or bool(pt_cp.vl["EBCMRegenPaddle"]['RegenPaddle'])
+    brake_light_enable = False
+    if self.car_fingerprint == CAR.BOLT:
+      if ret.aEgo < -1.3:
+        brake_light_enable = True
+    ret.brakeLights = ret.brakePressed or self.regen_pressed or brake_light_enable
 
     # 0 - inactive, 1 - active, 2 - temporary limited, 3 - failed
     self.lkas_status = pt_cp.vl["PSCMStatus"]['LKATorqueDeliveredStatus']
     ret.steerWarning = self.lkas_status not in [0, 1]
-    
+
     ret.steeringTorqueEps = pt_cp.vl["PSCMStatus"]['LKATorqueDelivered']
     self.engineRPM = pt_cp.vl["ECMEngineStatus"]['EngineRPM']
 
@@ -98,7 +102,7 @@ class CarState(CarStateBase):
       self.autoHold = False
 
     ret.autoHoldActivated = self.autoHoldActivated
-      
+
     return ret
 
 
@@ -137,9 +141,10 @@ class CarState(CarStateBase):
       ("DistanceButton", "ASCMSteeringButton", 0),
       ("LKATorqueDelivered", "PSCMStatus", 0),
       ("EngineRPM", "ECMEngineStatus", 0),
+      ("ACCCmdActive", "ASCMActiveCruiseControlStatus", 0),
     ]
 
-    if CP.carFingerprint == CAR.VOLT:
+    if CP.carFingerprint == CAR.VOLT  or CP.carFingerprint == CAR.BOLT:
       signals += [
         ("RegenPaddle", "EBCMRegenPaddle", 0),
       ]
