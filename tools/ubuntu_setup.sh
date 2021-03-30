@@ -96,7 +96,7 @@ eval "$(pyenv virtualenv-init -)"
 pip install --upgrade pip #==20.2.4
 
 # install pipenv
-pip install pipenv== #2020.8.13
+pip install pipenv #==2020.8.13
 
 #install reqs
 pipenv install numpy tensorflow scons jinja2 cython sympy cffi
