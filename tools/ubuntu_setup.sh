@@ -52,7 +52,8 @@ sudo apt-get update && sudo apt-get install -y \
     vim \
     wget \
     gcc-arm-none-eabi \
-    python-numpy
+    python-numpy \
+    lsb-core
 
 # install git lfs
 if ! command -v "git-lfs" > /dev/null 2>&1; then
@@ -92,10 +93,10 @@ eval "$(pyenv virtualenv-init -)"
 # **** in python env ****
 
 # upgrade pip
-pip install --upgrade pip==20.2.4
+pip install --upgrade pip #==20.2.4
 
 # install pipenv
-pip install pipenv==2020.8.13
+pip install pipenv== #2020.8.13
 
 #install reqs
 pipenv install numpy tensorflow scons jinja2 cython sympy cffi
