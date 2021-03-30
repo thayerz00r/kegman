@@ -83,6 +83,9 @@ git lfs pull
 git submodule init
 git submodule update
 
+# set pyenv path
+export PATH="/home/openpilot/.pyenv/bin:$PATH"
+
 # install python
 pyenv install -s 3.8.5
 pyenv global 3.8.5
