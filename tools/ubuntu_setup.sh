@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -i
 
 sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     autoconf \
