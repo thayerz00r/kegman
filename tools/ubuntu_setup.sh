@@ -1,3 +1,5 @@
+#!/bin/bash -e
+
 sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     autoconf \
     build-essential \
@@ -56,6 +58,11 @@ if ! command -v "git-lfs" > /dev/null 2>&1; then
   sudo apt-get install git-lfs
 fi
 
+# install pyenv
+if ! command -v "pyenv" > /dev/null 2>&1; then
+  curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+fi
+
 # install bashrc
 source ~/.bashrc
 if [ -z "$OPENPILOT_ENV" ]; then
@@ -63,11 +70,6 @@ if [ -z "$OPENPILOT_ENV" ]; then
   echo "source $OP_DIR/tools/openpilot_env.sh" >> ~/.bashrc
   source ~/.bashrc
   echo "added openpilot_env to bashrc"
-fi
-
-# install pyenv
-if ! command -v "pyenv" > /dev/null 2>&1; then
-  curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
 fi
 
 # in the openpilot repo
