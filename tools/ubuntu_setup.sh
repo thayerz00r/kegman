@@ -65,6 +65,8 @@ if [ -z "$OPENPILOT_ENV" ]; then
   echo "added openpilot_env to bashrc"
 fi
 
+source ~/.bashrc
+
 # install pyenv
 if ! command -v "pyenv" > /dev/null 2>&1; then
   curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
