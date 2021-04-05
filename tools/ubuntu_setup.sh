@@ -1,7 +1,4 @@
-#!/bin/bash -e
-
-
-sudo apt-get update && sudo apt-get install -y \
+sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     autoconf \
     build-essential \
     bzip2 \
@@ -51,10 +48,7 @@ sudo apt-get update && sudo apt-get install -y \
     sudo \
     vim \
     wget \
-    gcc-arm-none-eabi \
-    python-numpy \
-    lsb-core \
-    nvidia-cuda-toolkit
+    gcc-arm-none-eabi
 
 # install git lfs
 if ! command -v "git-lfs" > /dev/null 2>&1; then
@@ -84,33 +78,13 @@ git lfs pull
 git submodule init
 git submodule update
 
-# set pyenv path
-export PATH="/home/openpilot/.pyenv/bin:$PATH"
-
 # install python
 pyenv install -s 3.8.5
 pyenv global 3.8.5
 pyenv rehash
 eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
 
 # **** in python env ****
-
-# upgrade pip
 pip install --upgrade pip==20.2.4
-
-# install pipenv
 pip install pipenv==2020.8.13
-
-#install reqs
-pipenv install numpy tensorflow==2.2.0 scons jinja2 cython sympy cffi opencv_python
-
-# pipenv setup (in openpilot dir)
-pipenv install --dev
-pipenv install --dev --system
 pipenv install --dev --system --deploy
-
-# for loggerd to work on ubuntu
-# TODO: PC should log somewhere else
-#sudo mkdir -p /data/media/0/realdata
-#sudo chown $USER /data/media/0/realdata
